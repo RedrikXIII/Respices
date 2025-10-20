@@ -2,6 +2,7 @@ package com.example.respices.views.screens
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,6 +44,7 @@ import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.RecipeViewModel
 import com.example.respices.views.elements.DurationPicker
 import com.example.respices.views.elements.EditableList
+import com.example.respices.views.elements.HorizontalLine
 import com.example.respices.views.elements.LocalSearchBar
 
 @Composable
@@ -74,6 +77,16 @@ fun StartPage(
 
       EditableList(selectedIngredients)
 
+      HorizontalLine(
+        color = Color.Black,
+        lineModifier = Modifier
+          .width(300.dp)
+          .height(1.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(40.dp)
+      )
+
       LocalSearchBar(
         placeholder = "Tags...",
         options = allTags,
@@ -86,6 +99,16 @@ fun StartPage(
 
       EditableList(selectedTags)
 
+      HorizontalLine(
+        color = Color.Black,
+        lineModifier = Modifier
+          .width(300.dp)
+          .height(1.dp),
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(40.dp)
+      )
+
       DurationPicker(
         initialTime = 0L,
         onConfirm = { time ->
@@ -93,13 +116,15 @@ fun StartPage(
         }
       )
 
-      Spacer(
+      HorizontalLine(
+        color = Color.Black,
+        lineModifier = Modifier
+          .fillMaxWidth()
+          .height(2.dp),
         modifier = Modifier
           .fillMaxWidth()
-          .height(2.dp)
+          .height(50.dp)
       )
-
-
     }
   }
 }

@@ -9,7 +9,7 @@ fun List<String>.getTopNSimilarity(n: Int, compareTo: String): List<String> {
       if (result[curId].getSimilarity(compareTo) >= item.getSimilarity(compareTo)) {
         result.add(curId + 1, item)
         if (result.size > n) {
-          result.removeLast()
+          result.removeAt(result.size - 1)
         }
         return@forEach
       }
@@ -17,10 +17,10 @@ fun List<String>.getTopNSimilarity(n: Int, compareTo: String): List<String> {
       curId--
     }
 
-    result.addFirst(item)
+    result.add(0, item)
 
     if (result.size > n) {
-      result.removeLast()
+      result.removeAt(result.size - 1)
     }
 
   }

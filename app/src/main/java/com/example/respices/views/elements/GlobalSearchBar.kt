@@ -60,7 +60,7 @@ fun GlobalSearchBar() {
           .background(Color(0xDDFFFFFF))
           .fillMaxWidth()
           .fillMaxHeight()
-          .padding(vertical = 24.dp, horizontal = 30.dp)
+          .padding(vertical = 12.dp, horizontal = 30.dp)
           .clickable(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
