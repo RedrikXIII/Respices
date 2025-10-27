@@ -1,51 +1,28 @@
 package com.example.respices.views.screens
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.respices.R
-import com.example.respices.support.services.SearchBarManager
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.RecipeViewModel
-import com.example.respices.views.elements.DurationPicker
-import com.example.respices.views.elements.EditableList
+import com.example.respices.views.elements.input.DurationPicker
+import com.example.respices.views.elements.output.EditableList
 import com.example.respices.views.elements.HorizontalLine
-import com.example.respices.views.elements.LocalSearchBar
+import com.example.respices.views.elements.input.LocalSearchBar
+import com.example.respices.views.elements.output.MealDisplay
 
 @Composable
 fun StartPage(
@@ -58,13 +35,15 @@ fun StartPage(
     val allTagsState by recipeViewModel.allTags.collectAsStateWithLifecycle()
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
+    val allMealsState by recipeViewModel.allMeals.collectAsStateWithLifecycle()
+    Log.d("meals test", allMealsState.toString())
     var selectedIngredients = remember { mutableStateListOf<String>() }
     var selectedTags = remember { mutableStateListOf<String>() }
 
     Column(
-
+      modifier = Modifier
+        .fillMaxWidth()
     ) {
-
       LocalSearchBar(
         placeholder = "Ingredients...",
         options = allIngredients,
@@ -125,6 +104,17 @@ fun StartPage(
           .fillMaxWidth()
           .height(50.dp)
       )
+
+      Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+          .fillMaxWidth()
+          .wrapContentHeight()
+      ) {
+        allMealsState.forEach {meal ->
+          MealDisplay(meal)
+        }
+      }
     }
   }
 }

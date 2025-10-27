@@ -1,23 +1,30 @@
 package com.example.respices.viewmodel
 
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.respices.storage.entities.Ingredient
+import com.example.respices.storage.entities.Meal
 import com.example.respices.storage.entities.Recipe
-import com.example.respices.storage.entities.RecipeWithIngredientsAndTags
 import com.example.respices.storage.entities.Tag
 import com.example.respices.storage.repositories.RecipeRepository
+import com.example.respices.support.services.LoggerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(
-  private val repository: RecipeRepository
-) : ViewModel() {
+  private val repository: RecipeRepository,
+  application: Application
+) : AndroidViewModel(application) {
+  // Context
+  private val appContext: Context = getApplication<Application>().applicationContext
 
   // UI State
-  private val _allRecipes = MutableStateFlow<List<RecipeWithIngredientsAndTags>>(emptyList())
-  val allRecipes: StateFlow<List<RecipeWithIngredientsAndTags>> = _allRecipes
+  private val _allMeals = MutableStateFlow<List<Meal>>(emptyList())
+  val allMeals: StateFlow<List<Meal>> = _allMeals
 
   private val _allIngredients = MutableStateFlow<List<Ingredient>>(emptyList())
   val allIngredients: StateFlow<List<Ingredient>> = _allIngredients
@@ -25,46 +32,73 @@ class RecipeViewModel(
   private val _allTags = MutableStateFlow<List<Tag>>(emptyList())
   val allTags: StateFlow<List<Tag>> = _allTags
 
-  private val _currentRecipe = MutableStateFlow<RecipeWithIngredientsAndTags?>(null)
-  val currentRecipe: StateFlow<RecipeWithIngredientsAndTags?> = _currentRecipe
+  private val _currentRecipe = MutableStateFlow<Meal?>(null)
+  val currentRecipe: StateFlow<Meal?> = _currentRecipe
 
   // Load Data
-  fun loadAllRecipes() {
+  fun loadAllMeals() {
     viewModelScope.launch {
-      _allRecipes.value = repository.loadAllRWIATs()
+      LoggerService.log("ViewModel: loading all meals...", appContext)
+      val result = repository.loadAllMeals()
+      LoggerService.log("ViewModel: loaded all meals", appContext)
+      _allMeals.value = result
     }
+
+    loadAllIngredients()
+    loadAllTags()
   }
 
   fun loadAllIngredients() {
     viewModelScope.launch {
-      _allIngredients.value = repository.loadAllIngredients()
+      LoggerService.log("ViewModel: loading all ingredients...", appContext)
+      val result = repository.loadAllIngredients()
+      LoggerService.log("ViewModel: loaded all ingredients", appContext)
+      _allIngredients.value = result
     }
   }
 
   fun loadAllTags() {
     viewModelScope.launch {
-      _allTags.value = repository.loadAllTags()
+      LoggerService.log("ViewModel: loading all tags...", appContext)
+      val result = repository.loadAllTags()
+      LoggerService.log("ViewModel: loaded all ingredients", appContext)
+      _allTags.value = result
     }
   }
 
-  fun loadRecipeById(id: Long) {
+  fun loadMealById(id: Long) {
     viewModelScope.launch {
-      _currentRecipe.value = repository.loadRWIATById(id)
+      LoggerService.log("ViewModel: loading a meal by id...", appContext)
+      val result = repository.loadMealById(id)
+      LoggerService.log("ViewModel: loaded a meal by id", appContext)
+      _currentRecipe.value = result
     }
   }
 
   // Insert/Delete Recipe
-  fun insertRecipe(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
+  fun insertMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
     viewModelScope.launch {
-      repository.insertRWIAT(recipe, ingredients, tags)
-      loadAllRecipes() // refresh UI state
+      LoggerService.log("ViewModel: inserting a meal...", appContext)
+      repository.insertMeal(recipe, ingredients, tags)
+      LoggerService.log("ViewModel: inserted a meal", appContext)
+      loadAllMeals() // refresh UI state
     }
   }
 
-  fun deleteRecipe(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
+  fun deleteMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
     viewModelScope.launch {
-      repository.deleteRWIAT(recipe, ingredients, tags)
-      loadAllRecipes() // refresh UI state
+      LoggerService.log("ViewModel: deleting a meal...", appContext)
+      repository.deleteMeal(recipe, ingredients, tags)
+      LoggerService.log("ViewModel: deleted a meal", appContext)
+      loadAllMeals() // refresh UI state
+    }
+  }
+
+  // Clear database
+  fun clearAll(onComplete: () -> Unit) {
+    viewModelScope.launch {
+      repository.clearDatabase()
+      onComplete.invoke()
     }
   }
 }

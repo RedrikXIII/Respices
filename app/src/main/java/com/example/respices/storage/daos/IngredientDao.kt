@@ -28,4 +28,7 @@ interface IngredientDao {
 
   @Query("SELECT * FROM ingredients WHERE name LIKE :name LIMIT 1")
   suspend fun loadByName(name: String): Ingredient?
+
+  @Query("DELETE FROM ingredients")
+  suspend fun clearTable()
 }

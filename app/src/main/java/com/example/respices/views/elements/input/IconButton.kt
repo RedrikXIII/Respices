@@ -1,4 +1,4 @@
-package com.example.respices.views.elements
+package com.example.respices.views.elements.input
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

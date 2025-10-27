@@ -1,4 +1,4 @@
-package com.example.respices.views.elements
+package com.example.respices.views.elements.output
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.respices.R
+import com.example.respices.support.utility.HeightBasedRoundedShape
 
 @Composable
 fun EditableList(
@@ -44,7 +45,7 @@ fun EditableList(
           .border(
             width = 2.dp,
             color = Color(0xFF000000),
-            shape = MaterialTheme.shapes.extraLarge
+            shape = HeightBasedRoundedShape()
           )
           .padding(horizontal = 10.dp)
           .height(40.dp)

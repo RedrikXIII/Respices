@@ -1,6 +1,5 @@
-package com.example.respices.views.elements
+package com.example.respices.views.elements.input
 
-import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

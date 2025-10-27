@@ -1,6 +1,6 @@
 package com.example.respices.support.extensions
 
-import com.example.respices.storage.entities.RecipeWithIngredientsAndTags
+import com.example.respices.storage.entities.Meal
 
 // Priority:
 /*
@@ -16,7 +16,7 @@ biggest preference wins
 
  */
 
-fun RecipeWithIngredientsAndTags.toString2(): String {
+fun Meal.toString2(): String {
   var result: String = "{${this.recipe.name}, ${this.recipe.time}, ${this.recipe.rating}, " +
           "${this.recipe.link}, ${this.recipe.steps}, "
 

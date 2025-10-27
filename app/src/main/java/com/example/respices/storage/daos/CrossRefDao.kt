@@ -21,8 +21,11 @@ interface CrossRefDao {
   @Update
   suspend fun update(ricr: RecipeIngredientCrossRef)
 
-  @Query("SELECT COUNT(*) FROM RecipeIngredientCrossRef WHERE ingredientId LIKE :id")
+  @Query("SELECT COUNT(*) FROM RecipeIngredientCrossRef WHERE ingredientId = :id")
   suspend fun countIngredientCrossRefsById(id: Long): Long
+
+  @Query("DELETE FROM RecipeIngredientCrossRef")
+  suspend fun clearTableRI()
 
   // RecipeTagCrossRef
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -34,6 +37,9 @@ interface CrossRefDao {
   @Update
   suspend fun update(rtcr: RecipeTagCrossRef)
 
-  @Query("SELECT COUNT(*) FROM RecipeTagCrossRef WHERE tagId LIKE :id")
+  @Query("SELECT COUNT(*) FROM RecipeTagCrossRef WHERE tagId = :id")
   suspend fun countTagCrossRefsById(id: Long): Long
+
+  @Query("DELETE FROM RecipeTagCrossRef")
+  suspend fun clearTableRT()
 }

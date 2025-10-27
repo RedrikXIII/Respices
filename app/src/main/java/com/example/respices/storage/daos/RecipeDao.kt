@@ -8,7 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.respices.storage.entities.Recipe
-import com.example.respices.storage.entities.RecipeWithIngredientsAndTags
+import com.example.respices.storage.entities.Meal
 
 @Dao
 interface RecipeDao {
@@ -31,9 +31,12 @@ interface RecipeDao {
   // RecipeWithIngredientsAndTags
   @Transaction
   @Query("SELECT * FROM recipes")
-  suspend fun loadAllRWIATs(): List<RecipeWithIngredientsAndTags>
+  suspend fun loadAllMeals(): List<Meal>
 
   @Transaction
   @Query("SELECT * FROM recipes WHERE recipeId = :id LIMIT 1")
-  suspend fun loadRWIATById(id: Long): RecipeWithIngredientsAndTags?
+  suspend fun loadMealById(id: Long): Meal?
+
+  @Query("DELETE FROM recipes")
+  suspend fun clearTable()
 }

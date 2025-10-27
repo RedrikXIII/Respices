@@ -6,7 +6,7 @@ import androidx.room.Relation
 import com.example.respices.storage.crossrefs.RecipeIngredientCrossRef
 import com.example.respices.storage.crossrefs.RecipeTagCrossRef
 
-data class RecipeWithIngredientsAndTags(
+data class Meal(
   @Embedded val recipe: Recipe,
 
   @Relation(

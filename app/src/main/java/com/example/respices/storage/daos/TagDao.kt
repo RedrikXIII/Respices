@@ -28,4 +28,7 @@ interface TagDao {
 
   @Query("SELECT * FROM tags WHERE name LIKE :name LIMIT 1")
   suspend fun loadByName(name: String): Tag?
+
+  @Query("DELETE FROM tags")
+  suspend fun clearTable()
 }
