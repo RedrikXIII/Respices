@@ -29,17 +29,35 @@ class RecipeRepository(
 
     LoggerService.log("RecipeRepository: inserted a new recipe", context)
 
+//    ingredients.forEach { ingredient ->
+//      val existingIngredient = ingredientDao.loadByName(ingredient.name)
+//      val ingredientId = existingIngredient?.ingredientId ?: ingredientDao.insert(ingredient)
+//      crossRefDao.insert(RecipeIngredientCrossRef(recipeId, ingredientId))
+//    }
+
     ingredients.forEach { ingredient ->
-      val existingIngredient = ingredientDao.loadByName(ingredient.name)
-      val ingredientId = existingIngredient?.ingredientId ?: ingredientDao.insert(ingredient)
+      val id = ingredientDao.insert(ingredient)
+      val ingredientId = if (id == -1L) {
+        ingredientDao.loadByName(ingredient.name)?.ingredientId ?: 0L
+      } else id
+
       crossRefDao.insert(RecipeIngredientCrossRef(recipeId, ingredientId))
     }
 
     LoggerService.log("RecipeRepository: inserted all ingredients", context)
 
+//    tags.forEach { tag ->
+//      val existingTag = tagDao.loadByName(tag.name)
+//      val tagId = existingTag?.tagId ?: tagDao.insert(tag)
+//      crossRefDao.insert(RecipeTagCrossRef(recipeId, tagId))
+//    }
+
     tags.forEach { tag ->
-      val existingTag = tagDao.loadByName(tag.name)
-      val tagId = existingTag?.tagId ?: tagDao.insert(tag)
+      val id = tagDao.insert(tag)
+      val tagId = if (id == -1L) {
+        tagDao.loadByName(tag.name)?.tagId ?: 0L
+      } else id
+
       crossRefDao.insert(RecipeTagCrossRef(recipeId, tagId))
     }
 

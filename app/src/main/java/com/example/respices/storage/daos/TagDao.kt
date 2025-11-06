@@ -11,7 +11,7 @@ import com.example.respices.storage.entities.Tag
 @Dao
 interface TagDao {
   // Basic CRUD
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insert(tag: Tag): Long
 
   @Delete

@@ -31,6 +31,7 @@ import com.example.respices.support.services.SearchBarManager
 fun LocalSearchBar(
   placeholder: String,
   options: List<String>,
+  exclude: List<String> = listOf(),
   onComplete: (String) -> Unit) {
 
   var isTyping by remember {mutableStateOf(false) }
@@ -46,6 +47,7 @@ fun LocalSearchBar(
         isTyping = true
         SearchBarManager.launchSearchBar(
           options = options,
+          exclude = exclude,
           placeholder = placeholder,
           onDone = { final ->
             onComplete.invoke(final)

@@ -11,7 +11,7 @@ import com.example.respices.storage.entities.Ingredient
 @Dao
 interface IngredientDao {
   // Basic CRUD
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insert(ingredient: Ingredient): Long
 
   @Delete

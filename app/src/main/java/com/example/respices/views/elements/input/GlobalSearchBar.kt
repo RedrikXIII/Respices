@@ -43,6 +43,7 @@ import com.example.respices.ui.theme.RespicesTheme
 @Composable
 fun GlobalSearchBar() {
   val options = SearchBarManager.curOptions
+  val exclude = SearchBarManager.excludeOptions
   val placeholder = SearchBarManager.curPlaceholder
   val curInput by SearchBarManager.curInput
   val isActive = SearchBarManager.isActive
@@ -119,7 +120,10 @@ fun GlobalSearchBar() {
             modifier = Modifier
               .fillMaxWidth()
           ) {
-            items(options.getTopNSimilarity(3, curInput)) {
+            items(options
+              .filter { op -> !exclude.contains(op) }
+              .getTopNSimilarity(3, curInput)
+            ) {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier

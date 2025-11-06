@@ -1,13 +1,14 @@
 package com.example.respices.support.extensions
 
+import com.example.respices.storage.entities.Ingredient
 import com.example.respices.storage.entities.Meal
+import com.example.respices.storage.entities.Tag
 
 // Priority:
 /*
 One-offs: pass or not, if first has and second doesn't first ALWAYS wins
 is within time
 are all ingredients there (<=)
-are all tags there (<=)
 
 Compare amount:
 amount of ingredients matching(0-1, 1 - all ingredients in base are present in compared)
@@ -30,6 +31,38 @@ fun Meal.toString2(): String {
     result += "${tag.name} "
   }
   result += " )}"
+
+  return result
+}
+
+fun Meal.isSelected(time: Long, ingredients: List<Ingredient>): Boolean {
+  if (this.recipe.time > time)
+    return false
+
+  this.ingredients.forEach { ting ->
+    if (ingredients.find { ing -> ting.name == ing.name } == null) {
+      return false
+    }
+  }
+
+  return true
+}
+
+fun Meal.acceptanceIndex(tags: List<Tag>): Double {
+  var result: Double = 1.0
+
+  if (tags.size > 0) {
+    var tags_matches: Double = 0.0
+    tags.forEach { tag ->
+      if (this.tags.find { tag2 -> tag.name.equals(tag2.name, true)} != null) {
+        tags_matches++
+      }
+    }
+
+    result *= (tags_matches * 1.0 / tags.size) + 1
+  }
+
+  result *= (this.recipe.rating / 10.0) + 1
 
   return result
 }

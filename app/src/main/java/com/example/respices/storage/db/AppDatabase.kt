@@ -22,7 +22,7 @@ import com.example.respices.storage.entities.Tag
     RecipeIngredientCrossRef::class,
     RecipeTagCrossRef::class
   ],
-  version = 1
+  version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
   // DAOs
@@ -40,8 +40,9 @@ abstract class AppDatabase : RoomDatabase() {
         val instance = Room.databaseBuilder(
           context.applicationContext,
           AppDatabase::class.java,
+
           "app_database"
-        ).build()
+        ).fallbackToDestructiveMigration(true).build()
         INSTANCE = instance
         instance
       }

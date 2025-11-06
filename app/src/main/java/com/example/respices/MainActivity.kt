@@ -1,34 +1,45 @@
 package com.example.respices
 
 import android.content.ContentValues
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.respices.storage.db.AppDatabase
 import com.example.respices.storage.entities.Ingredient
@@ -36,10 +47,9 @@ import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
 import com.example.respices.storage.repositories.RecipeRepository
 import com.example.respices.support.enums.Screen
-import com.example.respices.support.extensions.replaceTyping
-import com.example.respices.support.extensions.toString2
 import com.example.respices.support.services.GlobalState
 import com.example.respices.support.services.LoggerService
+import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.LocalRecipeViewModel
 import com.example.respices.viewmodel.RecipeViewModel
@@ -52,8 +62,8 @@ import com.example.respices.views.screens.MealEdit
 import com.example.respices.views.screens.MealList
 import com.example.respices.views.screens.MealView
 import com.example.respices.views.screens.StartPage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -77,6 +87,7 @@ class MainActivity : ComponentActivity() {
       RespicesTheme {
 
         val context = LocalContext.current
+        val scope = rememberCoroutineScope()
         val activity = context as ComponentActivity
 
         val repository = remember {
@@ -118,6 +129,12 @@ class MainActivity : ComponentActivity() {
                   .fillMaxHeight()
               ) {
                 val scrollState = rememberScrollState()
+                var bottomReached by remember { mutableStateOf(false) }
+                val bottomReachedDelay = 250L
+
+                LaunchedEffect(GlobalState.currentScreen.value) {
+                  scrollState.scrollTo(0)
+                }
 
                 Column(
                   modifier = Modifier
@@ -126,8 +143,8 @@ class MainActivity : ComponentActivity() {
                     .verticalScroll(scrollState)
                 ) {
                   when (GlobalState.currentScreen.value) {
-                    Screen.START_PAGE -> StartPage()
-                    Screen.MEAL_LIST -> MealList()
+                    Screen.START_PAGE -> StartPage(bottomReached)
+                    Screen.MEAL_LIST -> MealList(bottomReached)
                     Screen.MEAL_VIEW -> MealView()
                     Screen.MEAL_EDIT -> MealEdit()
                     Screen.CSV_VIEW -> CSVView()
@@ -135,7 +152,51 @@ class MainActivity : ComponentActivity() {
                   }
                 }
 
+                if (scrollState.value > 50) {
+                  Box(
+                    modifier = Modifier
+                      .background(color = Color(red = 255, green = 255, blue = 255, alpha = 200))
+                      .padding(5.dp)
+                      .height(70.dp)
+                      .width(70.dp)
+                      .align(Alignment.TopStart)
+                      .clickable {
+                        scope.launch {
+                          scrollState.animateScrollTo(0)
+                        }
+                      }
+                  ) {
+                    Image(
+                      painter = painterResource(R.drawable.outline_arrow_circle_up_24),
+                      contentDescription = "scroll up",
+                      modifier = Modifier
+                        .fillMaxSize()
+                    )
+                  }
+                }
+
                 GlobalSearchBar()
+
+                LaunchedEffect(scrollState.value, scrollState.maxValue) {
+                  if (scrollState.maxValue == 0) {
+                    while (scrollState.maxValue == 0) {
+                      bottomReached = true
+                      delay(bottomReachedDelay*1/10)
+                      bottomReached = false
+                      delay(bottomReachedDelay*9/10)
+                    }
+                  }
+                  if (scrollState.value >= scrollState.maxValue && !bottomReached) {
+                    while (scrollState.value >= scrollState.maxValue) {
+                      bottomReached = true
+                      delay(bottomReachedDelay*1/10)
+                      bottomReached = false
+                      delay(bottomReachedDelay*9/10)
+                    }
+                  } else if (scrollState.value < scrollState.maxValue) {
+                    bottomReached = false
+                  }
+                }
               }
             }
           }
@@ -212,43 +273,7 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  fun TestLoadDatabase(recipeViewModel: RecipeViewModel) {
-    LoggerService.log("MainActivity: test loading the database...", this)
-
-    lifecycleScope.launch {
-      recipeViewModel.allMeals.collect { meals ->
-        var result: String = ""
-        meals.forEach { recipe ->
-          result += recipe.toString2() + "\n"
-        }
-        Log.d("db test recipes", result)
-        LoggerService.log("MainActivity: loaded all meals size ${meals.size}", applicationContext)
-      }
-    }
-
-    lifecycleScope.launch {
-      recipeViewModel.allIngredients.collect { ings ->
-        var result: String = ""
-        ings.forEach { ing ->
-          result += ing.name + "\n"
-        }
-        Log.d("db test ingredients", result)
-        LoggerService.log("MainActivity: loaded all ingredients size ${ings.size}", applicationContext)
-      }
-    }
-
-    lifecycleScope.launch {
-      recipeViewModel.allTags.collect { tags ->
-        var result: String = ""
-        tags.forEach { tag ->
-          result += tag.name + "\n"
-        }
-        Log.d("db test tags", result)
-        LoggerService.log("MainActivity: loaded all tags size ${tags.size}", applicationContext)
-      }
-    }
-  }
-
+  @RequiresApi(Build.VERSION_CODES.Q)
   private fun setupCrashLogging() {
     Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
       // Prepare content values for MediaStore

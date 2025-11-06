@@ -27,7 +27,8 @@ import com.example.respices.support.utility.HeightBasedRoundedShape
 
 @Composable
 fun EditableList(
-  list: SnapshotStateList<String>
+  list: SnapshotStateList<String>,
+  onRemove: (String) -> Unit
 ) {
   FlowRow(
     modifier = Modifier
@@ -66,6 +67,7 @@ fun EditableList(
             .aspectRatio(1.0f)
             .clickable {
               list.removeAt(index)
+              onRemove.invoke(str)
             }
         )
       }

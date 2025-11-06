@@ -1,5 +1,6 @@
 package com.example.respices.views.elements.input
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -54,11 +55,11 @@ fun DurationPicker(
 ) {
   var curTime by remember { mutableLongStateOf(initialTime) }
 
-  var hoursFieldValue by remember { mutableStateOf(TextFieldValue("")) }
-  var minutesFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+  var hoursFieldValue by remember { mutableStateOf(TextFieldValue("0")) }
+  var minutesFieldValue by remember { mutableStateOf(TextFieldValue("00")) }
 
-  var curHours by remember { mutableStateOf("") }
-  var curMinutes by remember { mutableStateOf("") }
+  var curHours by remember { mutableStateOf("0") }
+  var curMinutes by remember { mutableStateOf("00") }
 
   val secondFocusRequester = remember { FocusRequester() }
 
@@ -115,6 +116,7 @@ fun DurationPicker(
               if (newInput.selection.start >= 2) {
                 hoursFieldValue = hoursFieldValue.copy(selection = TextRange(0, 0))
                 minutesFieldValue = minutesFieldValue.copy(selection = TextRange(0, 0))
+                onConfirm(curTime)
                 secondFocusRequester.requestFocus()
               }
             }
@@ -183,12 +185,13 @@ fun DurationPicker(
               curMinutes.toLongOrNull()?.let {
                 val nit = max(min(it, 59L), 0L)
                 curTime = curTime.div(60) * 60 + nit
-                curMinutes = nit.toString()
+                curMinutes = "${nit.div(10)}${nit.mod(10)}"
               }
               minutesFieldValue = newInput.copy(text = curMinutes)
               if (newInput.selection.start >= 2) {
                 hoursFieldValue = hoursFieldValue.copy(selection = TextRange(0, 0))
                 minutesFieldValue = minutesFieldValue.copy(selection = TextRange(0, 0))
+                onConfirm(curTime)
                 focusManager.clearFocus()
               }
             }

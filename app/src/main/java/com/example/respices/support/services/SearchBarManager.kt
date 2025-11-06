@@ -18,8 +18,12 @@ object SearchBarManager {
 
   private var onComplete: (String) -> Unit = {}
 
+  var excludeOptions by mutableStateOf<List<String>>(listOf())
+    private set
+
   fun launchSearchBar(
     options: List<String> = listOf(),
+    exclude: List<String> = listOf(),
     placeholder: String = "",
     onDone: (String) -> Unit
   ) {
@@ -28,6 +32,7 @@ object SearchBarManager {
 
     curInput.value = ""
     curOptions = options
+    excludeOptions = exclude
     curPlaceholder = placeholder
     isActive = true
     onComplete = onDone
