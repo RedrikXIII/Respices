@@ -3,6 +3,8 @@ package com.example.respices.views.elements.input
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,15 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +51,8 @@ import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.support.extensions.replaceTyping
 import com.example.respices.ui.theme.RespicesTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
@@ -55,18 +63,40 @@ fun DurationPicker(
 ) {
   var curTime by remember { mutableLongStateOf(initialTime) }
 
-  var hoursFieldValue by remember { mutableStateOf(TextFieldValue("0")) }
-  var minutesFieldValue by remember { mutableStateOf(TextFieldValue("00")) }
+  var hoursFieldValue by remember { mutableStateOf(TextFieldValue("23")) }
+  var minutesFieldValue by remember { mutableStateOf(TextFieldValue("59")) }
 
-  var curHours by remember { mutableStateOf("0") }
-  var curMinutes by remember { mutableStateOf("00") }
-
-  val secondFocusRequester = remember { FocusRequester() }
+  var curHours by remember { mutableStateOf("23") }
+  var curMinutes by remember { mutableStateOf("59") }
 
   val focusManager = LocalFocusManager.current
 
-  var isFocused by remember { mutableStateOf(false) }
-  var isFocused2 by remember { mutableStateOf(false) }
+  val bringIntoViewRequester = remember { BringIntoViewRequester() }
+  val coroutineScope = rememberCoroutineScope()
+
+  var wasFocused by remember { mutableStateOf(false) }
+  var wasFocused2 by remember { mutableStateOf(false) }
+
+  var selectionPrev by remember {mutableStateOf(TextRange(0, 0))}
+
+  val hourFocusRequester = remember { FocusRequester() }
+  val minuteFocusRequester = remember { FocusRequester() }
+
+  var isMinuteTransition by remember { mutableStateOf(false) }
+  var isFocusClearRequested by remember { mutableStateOf(false) }
+
+  LaunchedEffect(isFocusClearRequested) {
+    if (isFocusClearRequested) {
+      focusManager.clearFocus(force = true)
+      isFocusClearRequested = false
+
+      if (isMinuteTransition) {
+        minuteFocusRequester.requestFocus()
+        isMinuteTransition = false
+      }
+    }
+  }
+
   RespicesTheme {
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -96,13 +126,25 @@ fun DurationPicker(
             width = 1.dp
           )
           .padding(all = 10.dp)
+          .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+          ) {
+            hourFocusRequester.requestFocus()
+          }
       ) {
         OutlinedTextField(
           value = hoursFieldValue,
-          onValueChange = { newInput ->
+          onValueChange = { newInputPre: TextFieldValue ->
+            var newText = newInputPre.text
+            if (newText == "") {
+              newText = "0"
+            }
+            val newInput = newInputPre.copy(text = newText)
+
             newInput.text.toLongOrNull()?.let {
               val str: String = newInput.text
-              curHours = curHours.replaceTyping(str)
+              curHours = curHours.replaceTyping(str, newInput.selection.end)
 
               if (curHours.length > 2) {
                 curHours = curHours.substring(startIndex = 0, endIndex = 2)
@@ -113,13 +155,18 @@ fun DurationPicker(
                 curHours = nit.toString()
               }
               hoursFieldValue = newInput.copy(text = curHours)
-              if (newInput.selection.start >= 2) {
-                hoursFieldValue = hoursFieldValue.copy(selection = TextRange(0, 0))
-                minutesFieldValue = minutesFieldValue.copy(selection = TextRange(0, 0))
+
+              if (newInput.selection.length == 0 &&
+                  newInput.selection.end >= 2 &&
+                  selectionPrev.length == 0 &&
+                  newInput.selection.end - selectionPrev.end == 1) {
                 onConfirm(curTime)
-                secondFocusRequester.requestFocus()
+                isMinuteTransition = true
+                isFocusClearRequested = true
               }
             }
+
+            selectionPrev = newInput.selection
           },
           keyboardOptions = KeyboardOptions(
             showKeyboardOnFocus = true,
@@ -137,11 +184,26 @@ fun DurationPicker(
             cursorColor = Color.Black
           ),
           modifier = Modifier
+            .bringIntoViewRequester(bringIntoViewRequester)
+            .focusRequester(hourFocusRequester)
             .onFocusChanged { focusState: FocusState ->
-              if (isFocused && !focusState.isFocused) {
+              if (!focusState.isFocused && wasFocused) {
                 onConfirm.invoke(curTime)
               }
-              isFocused = focusState.isFocused
+              if (focusState.isFocused && !wasFocused) {
+                coroutineScope.launch {
+                  delay(50)
+                  selectionPrev = TextRange(0)
+                  hoursFieldValue = hoursFieldValue.copy(selection = TextRange(0))
+                }
+              }
+              if (focusState.isFocused) {
+                coroutineScope.launch {
+                  bringIntoViewRequester.bringIntoView()
+                }
+              }
+
+              wasFocused = focusState.isFocused
             }
             .wrapContentSize(unbounded = true)
             .width(100.dp)
@@ -150,7 +212,7 @@ fun DurationPicker(
       }
 
       Text(
-        text = "h:",
+        text = "h",
         fontWeight = FontWeight.Bold,
         fontSize = 31.sp,
         modifier = Modifier
@@ -171,13 +233,25 @@ fun DurationPicker(
             width = 1.dp
           )
           .padding(all = 10.dp)
+          .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+          ) {
+            //minuteFocusRequester.requestFocus()
+          }
       ) {
         OutlinedTextField(
           value = minutesFieldValue,
-          onValueChange = { newInput: TextFieldValue ->
+          onValueChange = { newInputPre: TextFieldValue ->
+            var newText = newInputPre.text
+            if (newText == "") {
+              newText = "0"
+            }
+            val newInput = newInputPre.copy(text = newText)
+
             newInput.text.toLongOrNull()?.let {
               val str: String = newInput.text
-              curMinutes = curMinutes.replaceTyping(str)
+              curMinutes = curMinutes.replaceTyping(str, newInput.selection.end)
 
               if (curMinutes.length > 2) {
                 curMinutes = curMinutes.substring(startIndex = 0, endIndex = 2)
@@ -188,13 +262,17 @@ fun DurationPicker(
                 curMinutes = "${nit.div(10)}${nit.mod(10)}"
               }
               minutesFieldValue = newInput.copy(text = curMinutes)
-              if (newInput.selection.start >= 2) {
-                hoursFieldValue = hoursFieldValue.copy(selection = TextRange(0, 0))
-                minutesFieldValue = minutesFieldValue.copy(selection = TextRange(0, 0))
+
+              if (newInput.selection.length == 0 &&
+                  newInput.selection.end >= 2 &&
+                  selectionPrev.length == 0 &&
+                  newInput.selection.end - selectionPrev.end == 1) {
                 onConfirm(curTime)
-                focusManager.clearFocus()
+                isFocusClearRequested = true
               }
             }
+
+            selectionPrev = newInput.selection
           },
           keyboardOptions = KeyboardOptions(
             showKeyboardOnFocus = true,
@@ -211,13 +289,26 @@ fun DurationPicker(
             cursorColor = Color.Black
           ),
           modifier = Modifier
-            .focusRequester(secondFocusRequester)
+            .bringIntoViewRequester(bringIntoViewRequester)
+            .focusRequester(minuteFocusRequester)
             .onFocusChanged { focusState: FocusState ->
-              if (isFocused2 && !focusState.isFocused) {
+              if (!focusState.isFocused && wasFocused2) {
                 onConfirm(curTime)
-                focusManager.clearFocus()
               }
-              isFocused2 = focusState.isFocused
+              if (focusState.isFocused && !wasFocused2) {
+                coroutineScope.launch {
+                  delay(50)
+                  selectionPrev = TextRange(0)
+                  minutesFieldValue = minutesFieldValue.copy(selection = TextRange(0))
+                }
+              }
+              if (focusState.isFocused) {
+                coroutineScope.launch {
+                  bringIntoViewRequester.bringIntoView()
+                }
+              }
+
+              wasFocused2 = focusState.isFocused
             }
             .wrapContentSize(unbounded = true)
             .height(100.dp)

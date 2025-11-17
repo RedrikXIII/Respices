@@ -14,12 +14,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.respices.storage.db.AppDatabase
 import com.example.respices.storage.entities.Ingredient
@@ -71,6 +74,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
+    WindowCompat.setDecorFitsSystemWindows(window, false)
 
     //Toast.makeText(this, "App Start", Toast.LENGTH_SHORT).show()
 
@@ -120,6 +124,7 @@ class MainActivity : ComponentActivity() {
                 .fillMaxHeight()
                 .fillMaxWidth()
                 .padding(top = 40.dp)
+                .focusable()
             ) {
               TopBar()
 
@@ -141,6 +146,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp)
                     .verticalScroll(scrollState)
+                    .imePadding()
                 ) {
                   when (GlobalState.currentScreen.value) {
                     Screen.START_PAGE -> StartPage(bottomReached)
@@ -155,11 +161,14 @@ class MainActivity : ComponentActivity() {
                 if (scrollState.value > 50) {
                   Box(
                     modifier = Modifier
-                      .background(color = Color(red = 255, green = 255, blue = 255, alpha = 200))
-                      .padding(5.dp)
                       .height(70.dp)
                       .width(70.dp)
-                      .align(Alignment.TopStart)
+                      .padding(5.dp)
+                      .background(
+                        color = Color.White,
+                        shape = HeightBasedRoundedShape()
+                      )
+                      .align(Alignment.TopEnd)
                       .clickable {
                         scope.launch {
                           scrollState.animateScrollTo(0)
@@ -213,7 +222,7 @@ class MainActivity : ComponentActivity() {
 
       recipeViewModel.insertMeal(
         Recipe(
-          name = "Recipe 1",
+          name = "Recipe C1",
           time = 90,
           rating = 1.5,
           link = "https smth smth",
@@ -232,7 +241,7 @@ class MainActivity : ComponentActivity() {
       )
       recipeViewModel.insertMeal(
         Recipe(
-          name = "Recipe 2",
+          name = "Recipe B2",
           time = 30,
           rating = 9.5,
           link = "",
@@ -251,7 +260,7 @@ class MainActivity : ComponentActivity() {
       )
       recipeViewModel.insertMeal(
         Recipe(
-          name = "Recipe 3",
+          name = "Recipe A3",
           time = 120,
           rating = 6.0,
           link = "https smth smth",

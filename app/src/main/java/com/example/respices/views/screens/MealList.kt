@@ -28,6 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.respices.R
 import com.example.respices.storage.entities.Meal
+import com.example.respices.storage.entities.Tag
+import com.example.respices.support.extensions.acceptanceIndex
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.RecipeViewModel
 import com.example.respices.views.elements.output.MealDisplay
@@ -44,8 +46,30 @@ fun MealList(
 
     LaunchedEffect(bottomReached) {
       if (bottomReached) {
+//        if (loadedMeals.size < allMealsState.size) {
+//          loadedMeals.add(allMealsState[loadedMeals.size])
+//        }
         if (loadedMeals.size < allMealsState.size) {
-          loadedMeals.add(allMealsState[loadedMeals.size])
+          val allMealNames = allMealsState.map { meal -> meal.recipe.name }
+
+          var highestLoaded: String = ""
+
+          if (loadedMeals.size > 0) {
+            highestLoaded = loadedMeals[loadedMeals.size - 1].recipe.name
+          }
+
+          var lowest: String = "\uFFFF"
+          allMealNames.forEach { value ->
+            if (value < lowest && value > highestLoaded) {
+              lowest = value
+            }
+          }
+
+          allMealsState.forEachIndexed { index, meal ->
+            if (lowest == allMealNames[index]) {
+              loadedMeals.add(meal)
+            }
+          }
         }
       }
     }

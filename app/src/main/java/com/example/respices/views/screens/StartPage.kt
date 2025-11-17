@@ -1,6 +1,5 @@
 package com.example.respices.views.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -64,24 +63,30 @@ fun StartPage(
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
     val allMealsState by recipeViewModel.allMeals.collectAsStateWithLifecycle()
-    Log.d("meals test", allMealsState.toString())
+    //Log.d("meals test", allMealsState.toString())
     val selectedIngredients = remember { mutableStateListOf<String>() }
     val selectedTags = remember { mutableStateListOf<String>() }
 
-    val selectedTime = remember { mutableLongStateOf(0) }
+    val selectedTime = remember { mutableLongStateOf(1439) }
 
-    val availableMeals by remember(allMealsState, selectedTime.longValue, selectedIngredients) {
+    val availableMeals by remember(
+      allMealsState,
+      selectedTime.longValue,
+      selectedIngredients,
+      selectedTags
+    ) {
       derivedStateOf {
         allMealsState.filter { meal ->
-          meal.isSelected(
-            selectedTime.longValue,
-            selectedIngredients.map { name ->
-              Ingredient(0, name)
-            }
-          )
-        }
+            meal.isSelected(
+              selectedTime.longValue,
+              selectedIngredients.map { name ->
+                Ingredient(0, name)
+              }
+            ) || (selectedIngredients.isEmpty() && selectedTags.isNotEmpty())
+          }
       }
     }
+
 
     val availableMealsIndex = remember(availableMeals) {
       derivedStateOf {
@@ -106,45 +111,30 @@ fun StartPage(
 //        Log.d("meals selection test", "meals total: ${allMealsState.map {meal -> meal.toString2()}}")
 //        Log.d("meals selection test", "meals selected: ${availableMeals.map {meal -> meal.toString2()}}")
 
-        Log.d("meals selection test", availableMealsIndex.value.toString())
+        //Log.d("meals selection test", availableMealsIndex.value.toString())
 
         if (suggestedMeals.size < availableMeals.size) {
-          if (suggestedMeals.size == 0) {
-            var highest: Double = -1000.0
-            availableMealsIndex.value.forEach { value ->
-              if (value > highest) {
-                highest = value
-              }
-            }
+          var lowestSuggested: Double = 1000.0
 
-            if (highest >= 0.0) {
-              availableMeals.forEachIndexed { index, meal ->
-                if (highest == availableMealsIndex.value[index]) {
-                  suggestedMeals.add(meal)
-                }
-              }
-            }
-          } else {
-            val highestSuggested: Double = suggestedMeals[suggestedMeals.size - 1]
+          if (suggestedMeals.size > 0) {
+            lowestSuggested = suggestedMeals[suggestedMeals.size - 1]
               .acceptanceIndex(
                 selectedTags.map { name ->
                   Tag(0, name)
                 }
               )
+          }
 
-            var highest: Double = -1000.0
-            availableMealsIndex.value.forEachIndexed { index, value ->
-              if (value > highest && value < highestSuggested) {
-                highest = value
-              }
+          var highest: Double = -1000.0
+          availableMealsIndex.value.forEachIndexed { index, value ->
+            if (value > highest && value < lowestSuggested) {
+              highest = value
             }
+          }
 
-            if (highest >= 0.0) {
-              availableMeals.forEachIndexed { index, meal ->
-                if (highest == availableMealsIndex.value[index]) {
-                  suggestedMeals.add(meal)
-                }
-              }
+          availableMeals.forEachIndexed { index, meal ->
+            if (highest == availableMealsIndex.value[index]) {
+              suggestedMeals.add(meal)
             }
           }
         }

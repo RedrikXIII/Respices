@@ -38,3 +38,18 @@ fun String.replaceTyping(newStr: String): String {
 
   return newStr
 }
+
+fun String.replaceTyping(newStr: String, cursor: Int): String {
+  if (cursor >= 0 && cursor <= newStr.length) {
+    if (newStr.length - this.length == 1) {
+      var res: String = newStr.substring(startIndex = 0, endIndex = cursor)
+      if (cursor < newStr.length - 1) {
+        res += newStr.substring(startIndex = cursor + 1, endIndex = newStr.length)
+      }
+
+      return res
+    }
+  }
+
+  return newStr
+}

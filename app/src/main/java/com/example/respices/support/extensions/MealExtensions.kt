@@ -23,14 +23,20 @@ fun Meal.toString2(): String {
 
   result += "ingredients: ("
   this.ingredients.forEach{ ing ->
-    result += "${ing.name} "
+    result += ing.name
+    if (ing.ingredientId != this.ingredients.last().ingredientId) {
+      result += " "
+    }
   }
 
-  result += " ), tags: ("
+  result += "), tags: ("
   this.tags.forEach{ tag ->
-    result += "${tag.name} "
+    result += tag.name
+    if (tag.tagId != this.tags.last().tagId) {
+      result += " "
+    }
   }
-  result += " )}"
+  result += ")}"
 
   return result
 }
@@ -39,8 +45,8 @@ fun Meal.isSelected(time: Long, ingredients: List<Ingredient>): Boolean {
   if (this.recipe.time > time)
     return false
 
-  this.ingredients.forEach { ting ->
-    if (ingredients.find { ing -> ting.name == ing.name } == null) {
+  this.ingredients.forEach { ing ->
+    if (ingredients.find { ing2 -> ing.name.equals(ing2.name, true)} == null) {
       return false
     }
   }
