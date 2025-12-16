@@ -2,6 +2,8 @@ package com.example.respices.views.elements.output
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,20 +17,27 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.storage.entities.Meal
+import com.example.respices.support.enums.Screen
+import com.example.respices.support.services.GlobalState
+import com.example.respices.support.services.SearchBarManager
 import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.views.elements.HorizontalLine
 
@@ -47,12 +56,24 @@ fun MealDisplay(
         width = 1.dp
       )
       .padding(vertical = 10.dp, horizontal = 20.dp)
+      .clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }
+      ) {
+        GlobalState.setCurrentMeal(meal)
+        GlobalState.setCurrentScreen(Screen.MEAL_VIEW)
+      }
   ) {
     Text(
       text = meal.recipe.name,
+      textAlign = TextAlign.Center,
       fontSize = 28.sp,
+      style = TextStyle(
+        lineHeight = 32.sp
+      ),
       modifier = Modifier
         .padding(vertical = 10.dp)
+        .widthIn(max = 350.dp)
     )
 
     HorizontalLine(
@@ -167,7 +188,7 @@ fun MealDisplay(
           painter = painterResource(R.drawable.outline_alarm_24),
           contentDescription = "clock icon",
           modifier = Modifier
-            .padding(end = 10.dp)
+            .padding(end = 10.dp, bottom = 4.dp)
             .size(35.dp)
         )
 

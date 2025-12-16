@@ -2,6 +2,7 @@ package com.example.respices.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,16 +37,18 @@ class RecipeViewModel(
   val currentRecipe: StateFlow<Meal?> = _currentRecipe
 
   // Load Data
-  fun loadAllMeals() {
+  fun loadAllMeals(onComplete: (List<Meal>) -> Unit = {}) {
     viewModelScope.launch {
       LoggerService.log("ViewModel: loading all meals...", appContext)
       val result = repository.loadAllMeals()
+      loadAllIngredients()
+      loadAllTags()
       LoggerService.log("ViewModel: loaded all meals", appContext)
       _allMeals.value = result
+      onComplete.invoke(allMeals.value)
     }
 
-    loadAllIngredients()
-    loadAllTags()
+
   }
 
   fun loadAllIngredients() {
@@ -75,23 +78,43 @@ class RecipeViewModel(
     }
   }
 
-  // Insert/Delete Recipe
-  fun insertMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
+  // Insert/Delete/Update Recipe
+  fun insertMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>, onComplete: (Long) -> Unit = {}) {
     viewModelScope.launch {
       LoggerService.log("ViewModel: inserting a meal...", appContext)
-      repository.insertMeal(recipe, ingredients, tags)
+      Log.d("insert test", "insert Id: ${recipe.recipeId}")
+      Log.d("insert test", "insert meal: ${recipe} ${ingredients} ${tags}")
+      val res = repository.insertMeal(recipe, ingredients, tags)
+      Log.d("insert test", "new insert Id: ${res}")
       LoggerService.log("ViewModel: inserted a meal", appContext)
-      loadAllMeals() // refresh UI state
+      loadAllMeals {
+        onComplete.invoke(res)
+      }
     }
   }
 
-  fun deleteMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
+  fun deleteMeal(recipe: Recipe, onComplete: () -> Unit = {}) {
     viewModelScope.launch {
       LoggerService.log("ViewModel: deleting a meal...", appContext)
-      repository.deleteMeal(recipe, ingredients, tags)
+      repository.deleteMeal(recipe)
       LoggerService.log("ViewModel: deleted a meal", appContext)
-      loadAllMeals() // refresh UI state
+      loadAllMeals {
+        onComplete.invoke()
+      }
     }
+  }
+
+  fun upsertMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>, onComplete: (Long) -> Unit = {}) {
+    LoggerService.log("ViewModel: upserting a meal...", appContext)
+    Log.d("upsert test", "upsert Id: ${recipe.recipeId}")
+    deleteMeal(recipe) {
+      Log.d("upsert test", "deleted successfully")
+      insertMeal(recipe, ingredients, tags) { id ->
+        Log.d("upsert test", "inserted successfully")
+        onComplete.invoke(id)
+      }
+    }
+    LoggerService.log("ViewModel: upserted a meal", appContext)
   }
 
   // Clear database

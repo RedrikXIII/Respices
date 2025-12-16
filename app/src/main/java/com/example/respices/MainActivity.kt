@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -39,7 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -94,6 +99,8 @@ class MainActivity : ComponentActivity() {
         val scope = rememberCoroutineScope()
         val activity = context as ComponentActivity
 
+        val focusManager = LocalFocusManager.current
+
         val repository = remember {
           val db = AppDatabase.getInstance(context)
           RecipeRepository(
@@ -125,6 +132,12 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(top = 40.dp)
                 .focusable()
+                .pointerInput(Unit) {
+                  detectTapGestures(onTap = {
+                    Log.d("global focus clear", "globally cleared focus")
+                    focusManager.clearFocus(force = true)
+                  })
+                }
             ) {
               TopBar()
 
@@ -139,20 +152,26 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(GlobalState.currentScreen.value) {
                   scrollState.scrollTo(0)
+
+                  if (GlobalState.currentScreen.value == Screen.START_PAGE ||
+                      GlobalState.currentScreen.value == Screen.MEAL_LIST ||
+                      GlobalState.currentScreen.value == Screen.CSV_VIEW) {
+                    GlobalState.setCurrentMeal(null)
+                  }
                 }
 
                 Column(
                   modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp)
+                    .padding(start = 15.dp, end = 15.dp)
                     .verticalScroll(scrollState)
                     .imePadding()
                 ) {
                   when (GlobalState.currentScreen.value) {
                     Screen.START_PAGE -> StartPage(bottomReached)
                     Screen.MEAL_LIST -> MealList(bottomReached)
-                    Screen.MEAL_VIEW -> MealView()
-                    Screen.MEAL_EDIT -> MealEdit()
+                    Screen.MEAL_VIEW -> MealView(GlobalState.currentMeal.value)
+                    Screen.MEAL_EDIT -> MealEdit(GlobalState.currentMeal.value)
                     Screen.CSV_VIEW -> CSVView()
                     Screen.MEAL_DELETE -> MealDelete()
                   }
@@ -225,8 +244,8 @@ class MainActivity : ComponentActivity() {
           name = "Recipe C1",
           time = 90,
           rating = 1.5,
-          link = "https smth smth",
-          steps = "step 1 \n step 2"
+          link = "https://preppykitchen.com/lemon-merengue-tarts/",
+          steps = "Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat"
         ),
         listOf(
           Ingredient(name = "carrots"),
@@ -244,7 +263,7 @@ class MainActivity : ComponentActivity() {
           name = "Recipe B2",
           time = 30,
           rating = 9.5,
-          link = "",
+          link = "https://preppykitchen.com/lemon-merengue-tarts/",
           steps = ""
         ),
         listOf(
@@ -260,11 +279,11 @@ class MainActivity : ComponentActivity() {
       )
       recipeViewModel.insertMeal(
         Recipe(
-          name = "Recipe A3",
+          name = "Recipe A3 Very Very Very Very Very Very Very Long",
           time = 120,
           rating = 6.0,
-          link = "https smth smth",
-          steps = "step 1 \n step 2"
+          link = "",
+          steps = ""
         ),
         listOf(
           Ingredient(name = "sugar"),

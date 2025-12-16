@@ -2,6 +2,7 @@ package com.example.respices.views.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -63,7 +64,6 @@ fun StartPage(
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
     val allMealsState by recipeViewModel.allMeals.collectAsStateWithLifecycle()
-    //Log.d("meals test", allMealsState.toString())
     val selectedIngredients = remember { mutableStateListOf<String>() }
     val selectedTags = remember { mutableStateListOf<String>() }
 
@@ -104,15 +104,6 @@ fun StartPage(
 
     LaunchedEffect(bottomReached) {
       if (bottomReached) {
-        //Toast.makeText(context, "Available Meals: ${availableMeals.size}", Toast.LENGTH_SHORT).show()
-
-//        Log.d("meals selection test", "time: ${selectedTime}")
-//        Log.d("meals selection test", "ingredients: ${selectedIngredients}")
-//        Log.d("meals selection test", "meals total: ${allMealsState.map {meal -> meal.toString2()}}")
-//        Log.d("meals selection test", "meals selected: ${availableMeals.map {meal -> meal.toString2()}}")
-
-        //Log.d("meals selection test", availableMealsIndex.value.toString())
-
         if (suggestedMeals.size < availableMeals.size) {
           var lowestSuggested: Double = 1000.0
 
@@ -154,15 +145,15 @@ fun StartPage(
         placeholder = "Ingredients...",
         options = allIngredients,
         onComplete = { str ->
-          if (!selectedIngredients.contains(str) && str.isNotEmpty()) {
-            selectedIngredients.add(str)
+          if (!selectedIngredients.contains(str.lowercase()) && str.isNotEmpty()) {
+            selectedIngredients.add(str.lowercase())
             suggestedMeals.clear()
           }
         },
         exclude = selectedIngredients
       )
 
-      EditableList(selectedIngredients) { _ ->
+      EditableList(selectedIngredients, arrangement = Arrangement.Center) { _ ->
         suggestedMeals.clear()
       }
 
@@ -180,15 +171,15 @@ fun StartPage(
         placeholder = "Tags...",
         options = allTags,
         onComplete = { str ->
-          if (!selectedTags.contains(str) && str.isNotEmpty()) {
-            selectedTags.add(str)
+          if (!selectedTags.contains(str.lowercase()) && str.isNotEmpty()) {
+            selectedTags.add(str.lowercase())
             suggestedMeals.clear()
           }
         },
         exclude = selectedTags
       )
 
-      EditableList(selectedTags) { _ ->
+      EditableList(selectedTags, arrangement = Arrangement.Center) { _ ->
         suggestedMeals.clear()
       }
 
@@ -203,7 +194,7 @@ fun StartPage(
       )
 
       DurationPicker(
-        initialTime = 0,
+        initialTime = 1439,
         onConfirm = { time ->
           suggestedMeals.clear()
           selectedTime.longValue = time

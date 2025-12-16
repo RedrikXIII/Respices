@@ -6,6 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
+import com.example.respices.storage.crossrefs.RecipeIngredientCrossRef
 import com.example.respices.storage.entities.Ingredient
 
 @Dao

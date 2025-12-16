@@ -24,7 +24,6 @@ fun HorizontalLine(
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
-      .fillMaxWidth()
       .wrapContentHeight()
       .then(modifier)
   ) {

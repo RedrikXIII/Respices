@@ -29,36 +29,32 @@ class RecipeRepository(
 
     LoggerService.log("RecipeRepository: inserted a new recipe", context)
 
-//    ingredients.forEach { ingredient ->
-//      val existingIngredient = ingredientDao.loadByName(ingredient.name)
-//      val ingredientId = existingIngredient?.ingredientId ?: ingredientDao.insert(ingredient)
-//      crossRefDao.insert(RecipeIngredientCrossRef(recipeId, ingredientId))
-//    }
+    ingredients.forEach { ingredientI ->
+      val ingredient = ingredientI.copy(name = ingredientI.name.lowercase())
 
-    ingredients.forEach { ingredient ->
       val id = ingredientDao.insert(ingredient)
       val ingredientId = if (id == -1L) {
         ingredientDao.loadByName(ingredient.name)?.ingredientId ?: 0L
       } else id
 
-      crossRefDao.insert(RecipeIngredientCrossRef(recipeId, ingredientId))
+      if (ingredientId != 0L) {
+        crossRefDao.insert(RecipeIngredientCrossRef(recipeId, ingredientId))
+      }
     }
 
     LoggerService.log("RecipeRepository: inserted all ingredients", context)
 
-//    tags.forEach { tag ->
-//      val existingTag = tagDao.loadByName(tag.name)
-//      val tagId = existingTag?.tagId ?: tagDao.insert(tag)
-//      crossRefDao.insert(RecipeTagCrossRef(recipeId, tagId))
-//    }
+    tags.forEach { tagI ->
+      val tag = tagI.copy(name = tagI.name.lowercase())
 
-    tags.forEach { tag ->
       val id = tagDao.insert(tag)
       val tagId = if (id == -1L) {
         tagDao.loadByName(tag.name)?.tagId ?: 0L
       } else id
 
-      crossRefDao.insert(RecipeTagCrossRef(recipeId, tagId))
+      if (tagId != 0L) {
+        crossRefDao.insert(RecipeTagCrossRef(recipeId, tagId))
+      }
     }
 
     LoggerService.log("RecipeRepository: inserted all tags", context)
@@ -67,24 +63,33 @@ class RecipeRepository(
   }
 
   @Transaction
-  suspend fun deleteMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>) {
+  suspend fun deleteMeal(recipe: Recipe) {
     LoggerService.log("RecipeRepository: deleting a meal...", context)
+
+    val ingredientIds: List<Long> = crossRefDao.loadAllRIByRecipe(recipe.recipeId)
+      .map { it.ingredientId }
+    val tagIds: List<Long> = crossRefDao.loadAllRTByRecipe(recipe.recipeId)
+      .map { it.tagId }
 
     recipeDao.delete(recipe)
 
     LoggerService.log("RecipeRepository: deleted a recipe", context)
 
-    ingredients.forEach { ingredient ->
-      if (crossRefDao.countIngredientCrossRefsById(ingredient.ingredientId) == 0L) {
-        ingredientDao.delete(ingredient)
+    ingredientIds.forEach { ingredientId ->
+      ingredientDao.loadById(ingredientId)?.let { ingredient ->
+        if (crossRefDao.countIngredientCrossRefsById(ingredientId) == 0L) {
+          ingredientDao.delete(ingredient)
+        }
       }
     }
 
     LoggerService.log("RecipeRepository: deleted all single ingredients", context)
 
-    tags.forEach { tag ->
-      if (crossRefDao.countTagCrossRefsById(tag.tagId) == 0L) {
-        tagDao.delete(tag)
+    tagIds.forEach { tagId ->
+      tagDao.loadById(tagId)?.let { tag ->
+        if (crossRefDao.countTagCrossRefsById(tagId) == 0L) {
+          tagDao.delete(tag)
+        }
       }
     }
 

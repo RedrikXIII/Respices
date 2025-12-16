@@ -7,13 +7,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
+import com.example.respices.storage.crossrefs.RecipeIngredientCrossRef
 import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Meal
 
 @Dao
 interface RecipeDao {
   // Basic CRUD
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
   suspend fun insert(recipe: Recipe): Long
 
   @Delete

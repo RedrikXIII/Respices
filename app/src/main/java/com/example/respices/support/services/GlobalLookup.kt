@@ -23,7 +23,7 @@ object GlobalLookup {
     ),
     Screen.MEAL_EDIT to Triple(
       Pair(Screen.START_PAGE, R.drawable.baseline_home_24),
-      Pair(Screen.MEAL_LIST, R.drawable.baseline_format_list_bulleted_24),
+      Pair(Screen.MEAL_VIEW, R.drawable.outline_assignment_24),
       Pair(Screen.MEAL_DELETE, R.drawable.outline_delete_24)
     ),
     Screen.CSV_VIEW to Triple(

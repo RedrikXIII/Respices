@@ -2,13 +2,16 @@ package com.example.respices.support.extensions
 
 import android.util.Log
 
-fun String.getSimilarity(str2: String): Double {
+fun String.getSimilarity(str2I: String): Double {
+  val str1 = this.lowercase()
+  val str2 = str2I.lowercase()
+
   var result: Double = 0.0
-  result -= this.length
+  result -= str1.length
   result -= str2.length
 
   val map: MutableMap<Char, Int> = mutableMapOf()
-  this.forEach { c ->
+  str1.forEach { c ->
     map[c] = (map[c] ?: 0) + 1
   }
 

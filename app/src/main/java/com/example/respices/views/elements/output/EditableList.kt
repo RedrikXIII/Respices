@@ -28,9 +28,11 @@ import com.example.respices.support.utility.HeightBasedRoundedShape
 @Composable
 fun EditableList(
   list: SnapshotStateList<String>,
+  arrangement: Arrangement.Horizontal = Arrangement.Start,
   onRemove: (String) -> Unit
 ) {
   FlowRow(
+    horizontalArrangement = arrangement,
     modifier = Modifier
       .fillMaxWidth()
       .heightIn(min = 40.dp)

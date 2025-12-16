@@ -2,7 +2,9 @@ package com.example.respices.support.extensions
 
 import com.example.respices.storage.entities.Ingredient
 import com.example.respices.storage.entities.Meal
+import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
+import com.example.respices.support.enums.MealFault
 
 // Priority:
 /*
@@ -71,4 +73,45 @@ fun Meal.acceptanceIndex(tags: List<Tag>): Double {
   result *= (this.recipe.rating / 10.0) + 1
 
   return result
+}
+
+fun Meal.isValid(): Pair<Boolean, MealFault> {
+  // Name -> Ingredients -> Time
+  if (this.recipe.name.trim() == "") {
+    return Pair(false, MealFault.NO_NAME)
+  }
+
+  if (this.ingredients.isEmpty()) {
+    return Pair(false, MealFault.NO_INGREDIENTS)
+  }
+
+  if (this.recipe.time == 0L) {
+    return Pair(false, MealFault.NO_TIME)
+  }
+
+  return Pair(true, MealFault.NONE)
+}
+
+fun Meal.isEmpty(): Boolean {
+  return this.recipe.name == "" &&
+          this.recipe.time == 0L &&
+          this.recipe.rating == 0.0 &&
+          this.recipe.link == "" &&
+          this.recipe.steps == "" &&
+          this.ingredients.isEmpty() &&
+          this.tags.isEmpty()
+}
+
+fun getEmptyMeal(): Meal {
+  return Meal(
+    recipe = Recipe(
+      name = "",
+      time = 0,
+      rating = 0.0,
+      link = "",
+      steps = ""
+    ),
+    ingredients = listOf(),
+    tags = listOf()
+  )
 }

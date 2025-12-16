@@ -63,11 +63,15 @@ fun DurationPicker(
 ) {
   var curTime by remember { mutableLongStateOf(initialTime) }
 
-  var hoursFieldValue by remember { mutableStateOf(TextFieldValue("23")) }
-  var minutesFieldValue by remember { mutableStateOf(TextFieldValue("59")) }
+  val ih = max(min(curTime.div(60L), 23L), 0L).toString()
+  val im0 = max(min(curTime.mod(60L), 59L), 0L)
+  val im = "${im0.div(10L)}${im0.mod(10L)}"
 
-  var curHours by remember { mutableStateOf("23") }
-  var curMinutes by remember { mutableStateOf("59") }
+  var hoursFieldValue by remember { mutableStateOf(TextFieldValue(ih)) }
+  var minutesFieldValue by remember { mutableStateOf(TextFieldValue(im)) }
+
+  var curHours by remember { mutableStateOf(ih) }
+  var curMinutes by remember { mutableStateOf(im) }
 
   val focusManager = LocalFocusManager.current
 
@@ -77,7 +81,7 @@ fun DurationPicker(
   var wasFocused by remember { mutableStateOf(false) }
   var wasFocused2 by remember { mutableStateOf(false) }
 
-  var selectionPrev by remember {mutableStateOf(TextRange(0, 0))}
+  var selectionPrev by remember { mutableStateOf(TextRange(0, 0)) }
 
   val hourFocusRequester = remember { FocusRequester() }
   val minuteFocusRequester = remember { FocusRequester() }
@@ -95,6 +99,20 @@ fun DurationPicker(
         isMinuteTransition = false
       }
     }
+  }
+
+  LaunchedEffect(initialTime) {
+    curTime = initialTime
+
+    val ihi = max(min(curTime.div(60L), 23L), 0L).toString()
+    val im0i = max(min(curTime.mod(60L), 59L), 0L)
+    val imi = "${im0i.div(10L)}${im0i.mod(10L)}"
+
+    curHours = ihi
+    curMinutes = imi
+
+    hoursFieldValue = hoursFieldValue.copy(text = ihi)
+    minutesFieldValue = minutesFieldValue.copy(text = imi)
   }
 
   RespicesTheme {
@@ -140,26 +158,41 @@ fun DurationPicker(
             if (newText == "") {
               newText = "0"
             }
-            val newInput = newInputPre.copy(text = newText)
+            var newInput = newInputPre.copy(text = newText)
 
-            newInput.text.toLongOrNull()?.let {
+            newInput.text.toLongOrNull()?.let { newInputLong ->
               val str: String = newInput.text
               curHours = curHours.replaceTyping(str, newInput.selection.end)
 
               if (curHours.length > 2) {
                 curHours = curHours.substring(startIndex = 0, endIndex = 2)
               }
-              curHours.toLongOrNull()?.let {
-                val nit = max(min(it, 23L), 0L)
+
+              curHours.toLongOrNull()?.let { curHoursLong ->
+                Log.d("time picker test", "new: $curHoursLong, old: ${curTime.div(60L)}")
+                if (curHoursLong < 10L && curTime.div(60L) >= 10L) {
+                  newInput = newInput.copy(
+                    selection = TextRange(newInput.selection.start - 1)
+                  )
+                  Log.d("time picker test", "selection changed: ${newInput.selection}")
+                }
+
+                val nit = max(min(curHoursLong, 23L), 0L)
                 curTime = nit * 60 + curTime.mod(60)
                 curHours = nit.toString()
               }
               hoursFieldValue = newInput.copy(text = curHours)
 
+              Log.d("time picker test", "copied selection: ${hoursFieldValue.selection}")
+
               if (newInput.selection.length == 0 &&
-                  newInput.selection.end >= 2 &&
-                  selectionPrev.length == 0 &&
-                  newInput.selection.end - selectionPrev.end == 1) {
+                  selectionPrev.length == 0 && (
+                    (newInput.selection.end >= 2 &&
+                     newInput.selection.end - selectionPrev.end == 1) ||
+                    (newInput.selection.end == 1 &&
+                     curTime.div(60L) == 0L
+                    ))
+              ) {
                 onConfirm(curTime)
                 isMinuteTransition = true
                 isFocusClearRequested = true
@@ -266,7 +299,8 @@ fun DurationPicker(
               if (newInput.selection.length == 0 &&
                   newInput.selection.end >= 2 &&
                   selectionPrev.length == 0 &&
-                  newInput.selection.end - selectionPrev.end == 1) {
+                  newInput.selection.end - selectionPrev.end == 1
+              ) {
                 onConfirm(curTime)
                 isFocusClearRequested = true
               }
