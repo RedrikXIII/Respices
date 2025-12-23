@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
@@ -91,6 +92,13 @@ class MainActivity : ComponentActivity() {
     LoggerService.log("MainActivity: Logger started", this)
 
     //Toast.makeText(this, "Logger Service", Toast.LENGTH_SHORT).show()
+
+    onBackPressedDispatcher.addCallback(this) {
+      if (!GlobalState.goToPrevScreen()) {
+        isEnabled = false
+        onBackPressedDispatcher.onBackPressed()
+      }
+    }
 
     setContent {
       RespicesTheme {
