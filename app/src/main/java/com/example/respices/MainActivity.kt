@@ -181,7 +181,7 @@ class MainActivity : ComponentActivity() {
                     Screen.MEAL_VIEW -> MealView(GlobalState.currentMeal.value)
                     Screen.MEAL_EDIT -> MealEdit(GlobalState.currentMeal.value)
                     Screen.CSV_VIEW -> CSVView()
-                    Screen.MEAL_DELETE -> MealDelete()
+                    Screen.MEAL_DELETE -> MealDelete(GlobalState.currentMeal.value)
                   }
                 }
 

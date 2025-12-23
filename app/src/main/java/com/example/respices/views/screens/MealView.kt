@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -38,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.storage.entities.Meal
+import com.example.respices.support.enums.Screen
+import com.example.respices.support.services.GlobalState
 import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.views.elements.HorizontalLine
@@ -47,6 +50,12 @@ fun MealView(
   mealI: Meal?
 ) {
   RespicesTheme {
+    LaunchedEffect(Unit) {
+      if (mealI == null) {
+        GlobalState.setCurrentScreen(Screen.MEAL_LIST)
+      }
+    }
+
     if (mealI == null) {
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
