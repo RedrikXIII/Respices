@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -14,11 +13,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -65,7 +61,7 @@ import com.example.respices.viewmodel.RecipeViewModel
 import com.example.respices.viewmodel.RecipeViewModelFactory
 import com.example.respices.views.elements.TopBar
 import com.example.respices.views.elements.input.GlobalSearchBar
-import com.example.respices.views.screens.CSVView
+import com.example.respices.views.screens.FileView
 import com.example.respices.views.screens.MealDelete
 import com.example.respices.views.screens.MealEdit
 import com.example.respices.views.screens.MealList
@@ -180,7 +176,7 @@ class MainActivity : ComponentActivity() {
                     Screen.MEAL_LIST -> MealList(bottomReached)
                     Screen.MEAL_VIEW -> MealView(GlobalState.currentMeal.value)
                     Screen.MEAL_EDIT -> MealEdit(GlobalState.currentMeal.value)
-                    Screen.CSV_VIEW -> CSVView()
+                    Screen.CSV_VIEW -> FileView()
                     Screen.MEAL_DELETE -> MealDelete(GlobalState.currentMeal.value)
                   }
                 }

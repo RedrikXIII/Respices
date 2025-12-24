@@ -20,7 +20,8 @@ import com.example.respices.ui.theme.RespicesTheme
 @Composable
 fun IconButton(
   icon: Int?,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  imageModifier: Modifier = Modifier
 ) {
   RespicesTheme {
     Box (
@@ -38,7 +39,7 @@ fun IconButton(
       Image(
         painter = painterResource(icon ?: R.drawable.baseline_question_mark_24),
         contentDescription = "Icon!",
-        modifier = Modifier
+        modifier = imageModifier
           .fillMaxHeight()
           .align(Alignment.Center)
       )

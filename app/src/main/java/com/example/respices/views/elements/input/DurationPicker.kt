@@ -1,6 +1,7 @@
 package com.example.respices.views.elements.input
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DurationPicker(
   initialTime: Long,
