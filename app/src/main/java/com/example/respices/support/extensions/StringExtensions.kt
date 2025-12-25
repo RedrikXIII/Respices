@@ -1,6 +1,10 @@
 package com.example.respices.support.extensions
 
 import android.util.Log
+import com.example.respices.support.classes.MealData
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 
 fun String.getSimilarity(str2I: String): Double {
   val str1 = this.lowercase()
@@ -55,4 +59,17 @@ fun String.replaceTyping(newStr: String, cursor: Int): String {
   }
 
   return newStr
+}
+
+fun String.isValidMealDataList(): Boolean {
+  return try {
+    Json.decodeFromString(
+      ListSerializer(MealData.serializer()),
+      this
+    )
+    true
+  }
+  catch (e: SerializationException) {
+    false
+  }
 }

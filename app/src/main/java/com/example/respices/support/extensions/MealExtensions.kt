@@ -4,6 +4,7 @@ import com.example.respices.storage.entities.Ingredient
 import com.example.respices.storage.entities.Meal
 import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
+import com.example.respices.support.classes.MealData
 import com.example.respices.support.enums.MealFault
 
 // Priority:
@@ -113,5 +114,17 @@ fun getEmptyMeal(): Meal {
     ),
     ingredients = listOf(),
     tags = listOf()
+  )
+}
+
+fun Meal.toMealData(): MealData {
+  return MealData(
+    name = this.recipe.name,
+    time = this.recipe.time,
+    rating = this.recipe.rating,
+    link = this.recipe.link,
+    steps = this.recipe.steps,
+    ingredients = this.ingredients.map { ingredient -> ingredient.name },
+    tags = this.tags.map { tag -> tag.name }
   )
 }

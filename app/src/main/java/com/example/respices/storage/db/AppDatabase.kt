@@ -22,7 +22,8 @@ import com.example.respices.storage.entities.Tag
     RecipeIngredientCrossRef::class,
     RecipeTagCrossRef::class
   ],
-  version = 2
+  version = 2,
+  exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
   // DAOs
