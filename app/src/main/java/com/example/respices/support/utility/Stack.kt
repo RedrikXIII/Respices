@@ -25,4 +25,8 @@ class Stack<E> {
   fun clear() {
     _stack.clear()
   }
+
+  override fun toString(): String {
+    return _stack.toString()
+  }
 }

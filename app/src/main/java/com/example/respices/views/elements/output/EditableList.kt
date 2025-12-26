@@ -1,9 +1,11 @@
 package com.example.respices.views.elements.output
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.support.utility.HeightBasedRoundedShape
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditableList(
   list: SnapshotStateList<String>,
@@ -45,6 +48,10 @@ fun EditableList(
           .wrapContentWidth()
           .padding(vertical = 10.dp)
           .padding(end = 10.dp)
+          .background(
+            color = MaterialTheme.colorScheme.primary,
+            shape = HeightBasedRoundedShape()
+          )
           .border(
             width = 2.dp,
             color = Color(0xFF000000),

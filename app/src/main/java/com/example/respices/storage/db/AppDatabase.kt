@@ -22,7 +22,7 @@ import com.example.respices.storage.entities.Tag
     RecipeIngredientCrossRef::class,
     RecipeTagCrossRef::class
   ],
-  version = 2,
+  version = 1,
   exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,11 +39,11 @@ abstract class AppDatabase : RoomDatabase() {
     fun getInstance(context: Context): AppDatabase {
       return INSTANCE ?: synchronized(this) {
         val instance = Room.databaseBuilder(
-          context.applicationContext,
-          AppDatabase::class.java,
+                context.applicationContext,
+                AppDatabase::class.java,
 
-          "app_database"
-        ).fallbackToDestructiveMigration(true).build()
+                "app_database"
+              ).fallbackToDestructiveMigration(false).build()
         INSTANCE = instance
         instance
       }

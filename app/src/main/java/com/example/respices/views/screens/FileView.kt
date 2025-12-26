@@ -2,6 +2,7 @@ package com.example.respices.views.screens
 
 import android.content.ClipData
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -83,6 +84,8 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
 
     val isFileValid = remember { mutableStateOf(true) }
 
+    val isChangesSaved = remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
       initialFile.value = allMealsJson
       currentFile.value = initialFile.value
@@ -95,6 +98,11 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
 //        Log.d("file view test", "valid new file")
 
         if (allMealsJson != currentFile.value) {
+          if (isChangesSaved.value) {
+            Toast.makeText(context, "Changes saved!", Toast.LENGTH_SHORT).show()
+          }
+          isChangesSaved.value = true
+
           val allNewMealData = Json.decodeFromString(
             ListSerializer(MealData.serializer()),
             currentFile.value
@@ -236,6 +244,9 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
         modifier = Modifier
           .padding(horizontal = 10.dp)
           .clickable {
+            Toast.makeText(context, "Rewound successfully!", Toast.LENGTH_SHORT).show()
+            isChangesSaved.value = false
+
             currentFile.value = initialFile.value
           },
         imageModifier = Modifier
@@ -243,51 +254,51 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
       )
     }
 
-    SelectionContainer {
-      Column(
-        modifier = Modifier
-          .wrapContentHeight()
-          .fillMaxWidth()
-      ) {
-        Spacer(
-          modifier = Modifier
-            .height(60.dp)
-        )
-        Text(
-          text = "COPY FROM HERE",
-          fontSize = 28.sp
-        )
-        Spacer(
-          modifier = Modifier
-            .height(40.dp)
-        )
-        Text(
-          text = """
-        [
-          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]}
-        ]
-        """.trimIndent(),
-          fontSize = 15.sp
-        )
-        Spacer(
-          modifier = Modifier
-            .height(40.dp)
-        )
-        Text(
-          text = """
-        [
-          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]},
-          {"name":"Recipe B2","time":30,"rating":9.5,"link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","sugar","tomatoes"],"tags":["soup","sweet","sour"]},
-          {"name":"Recipe A3 Very Very Very Very Very Very Very Long","time":120,"rating":6.0,"ingredients":["sugar","eggs","milk"],"tags":["sweet","party","long"]}
-        ]
-        """.trimIndent(),
-          fontSize = 15.sp
-        )
-        Spacer(
-          modifier = Modifier
-            .height(40.dp)
-        )
-      }
-    }
+//    SelectionContainer {
+//      Column(
+//        modifier = Modifier
+//          .wrapContentHeight()
+//          .fillMaxWidth()
+//      ) {
+//        Spacer(
+//          modifier = Modifier
+//            .height(60.dp)
+//        )
+//        Text(
+//          text = "COPY FROM HERE",
+//          fontSize = 28.sp
+//        )
+//        Spacer(
+//          modifier = Modifier
+//            .height(40.dp)
+//        )
+//        Text(
+//          text = """
+//        [
+//          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]}
+//        ]
+//        """.trimIndent(),
+//          fontSize = 15.sp
+//        )
+//        Spacer(
+//          modifier = Modifier
+//            .height(40.dp)
+//        )
+//        Text(
+//          text = """
+//        [
+//          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]},
+//          {"name":"Recipe B2","time":30,"rating":9.5,"link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","sugar","tomatoes"],"tags":["soup","sweet","sour"]},
+//          {"name":"Recipe A3 Very Very Very Very Very Very Very Long","time":120,"rating":6.0,"ingredients":["sugar","eggs","milk"],"tags":["sweet","party","long"]}
+//        ]
+//        """.trimIndent(),
+//          fontSize = 15.sp
+//        )
+//        Spacer(
+//          modifier = Modifier
+//            .height(40.dp)
+//        )
+//      }
+//    }
   }
 }

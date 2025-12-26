@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +47,7 @@ import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.views.elements.HorizontalLine
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MealView(
   mealI: Meal?
@@ -229,6 +232,10 @@ fun MealView(
                 .wrapContentHeight()
                 .wrapContentWidth()
                 .padding(vertical = 5.dp, horizontal = 5.dp)
+                .background(
+                  color = (MaterialTheme.colorScheme.secondary),
+                  shape = HeightBasedRoundedShape()
+                )
                 .border(
                   width = 1.dp,
                   color = Color(0xFF000000),
@@ -295,6 +302,10 @@ fun MealView(
                 .wrapContentHeight()
                 .wrapContentWidth()
                 .padding(vertical = 5.dp, horizontal = 5.dp)
+                .background(
+                  color = (MaterialTheme.colorScheme.secondary),
+                  shape = HeightBasedRoundedShape()
+                )
                 .border(
                   width = 1.dp,
                   color = Color(0xFF000000),

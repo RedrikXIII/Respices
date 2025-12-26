@@ -1,6 +1,7 @@
 package com.example.respices.views.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -132,6 +134,8 @@ fun MealEdit(
     val rewindFocusRequester = remember { FocusRequester() }
     val rewindInteractionSource = remember { MutableInteractionSource() }
 
+    val isChangesToast = remember { mutableStateOf(true) }
+
     val onMealChange = {
       meal.value = meal.value.copy(
         recipe = meal.value.recipe.copy(
@@ -151,6 +155,11 @@ fun MealEdit(
       )
 
       if (validation.first && !isUpdateBlocked.value) {
+        if (isChangesToast.value) {
+          Toast.makeText(context, "Changes saved!", Toast.LENGTH_SHORT).show()
+        }
+        isChangesToast.value = true
+
         // meal is valid - upsert
         isUpdateBlocked.value = true
         Log.d("meal edit test", "Valid change")
@@ -208,6 +217,7 @@ fun MealEdit(
       }
 
       isRewindConfirmed.value = false
+      isChangesToast.value = false
       onMealChange.invoke()
     }
 
@@ -302,6 +312,8 @@ fun MealEdit(
 
                   mealTime.longValue = initialMeal.value.recipe.time
 
+                  isChangesToast.value = false
+                  Toast.makeText(context, "Rewound successfully!", Toast.LENGTH_SHORT).show()
                   onMealChange.invoke()
                 }
               }
@@ -315,6 +327,10 @@ fun MealEdit(
               .wrapContentWidth()
               .wrapContentHeight()
               .padding(top = 20.dp)
+              .background(
+                color = MaterialTheme.colorScheme.onTertiary,
+                shape = MaterialTheme.shapes.large
+              )
               .border(
                 color = Color.Black,
                 width = 1.dp,
@@ -408,11 +424,22 @@ fun MealEdit(
         placeholder = { Text(text = "...") },
         colors = OutlinedTextFieldDefaults.colors(
           cursorColor = Color.Black,
-          focusedBorderColor = Color(0xFF79747e)
+          focusedBorderColor = Color.Black,
+          unfocusedBorderColor = Color.Black,
+          focusedTextColor = Color.Black,
+          unfocusedTextColor = Color.Black,
+          selectionColors = TextSelectionColors(
+            handleColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+          )
         ),
         modifier = Modifier
           .bringIntoViewRequester(bringIntoViewRequester)
           .fillMaxWidth()
+          .background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = MaterialTheme.shapes.extraSmall
+          )
           .onFocusChanged { focusState ->
             if (!focusState.isFocused && wasNameFocused.value) {
               onMealChange.invoke()
@@ -638,6 +665,9 @@ fun MealEdit(
             .height(60.dp)
             .width(80.dp)
             .graphicsLayer { clip = true }
+            .background(
+              color = MaterialTheme.colorScheme.surface
+            )
             .border(
               color = Color.Black,
               width = 1.dp
@@ -691,7 +721,15 @@ fun MealEdit(
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-              cursorColor = Color.Black
+              cursorColor = Color.Black,
+              focusedBorderColor = Color.Black,
+              unfocusedBorderColor = Color.Black,
+              focusedTextColor = Color.Black,
+              unfocusedTextColor = Color.Black,
+              selectionColors = TextSelectionColors(
+                handleColor = MaterialTheme.colorScheme.onSurface,
+                backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+              )
             ),
             modifier = Modifier
               .bringIntoViewRequester(bringIntoViewRequester)
@@ -790,11 +828,22 @@ fun MealEdit(
         ) },
         colors = OutlinedTextFieldDefaults.colors(
           cursorColor = Color.Black,
-          focusedBorderColor = Color(0xFF79747e)
+          focusedBorderColor = Color.Black,
+          unfocusedBorderColor = Color.Black,
+          focusedTextColor = Color.Black,
+          unfocusedTextColor = Color.Black,
+          selectionColors = TextSelectionColors(
+            handleColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+          )
         ),
         modifier = Modifier
           .bringIntoViewRequester(bringIntoViewRequester)
           .fillMaxWidth()
+          .background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = MaterialTheme.shapes.extraSmall
+          )
           .onFocusChanged { focusState ->
             if (!focusState.isFocused && wasStepsFocused.value) {
               onMealChange.invoke()
@@ -868,11 +917,22 @@ fun MealEdit(
         ) },
         colors = OutlinedTextFieldDefaults.colors(
           cursorColor = Color.Black,
-          focusedBorderColor = Color(0xFF79747e)
+          focusedBorderColor = Color.Black,
+          unfocusedBorderColor = Color.Black,
+          focusedTextColor = Color.Black,
+          unfocusedTextColor = Color.Black,
+          selectionColors = TextSelectionColors(
+            handleColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+          )
         ),
         modifier = Modifier
           .bringIntoViewRequester(bringIntoViewRequester)
           .fillMaxWidth()
+          .background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = MaterialTheme.shapes.extraSmall
+          )
           .onFocusChanged { focusState ->
             if (!focusState.isFocused && wasLinkFocused.value) {
               onMealChange.invoke()

@@ -1,6 +1,7 @@
 package com.example.respices.views.elements.input
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -60,6 +61,10 @@ fun LocalSearchBar(
       .border(
         width = 2.dp,
         color = Color(0xFF000000),
+        shape = MaterialTheme.shapes.extraLarge
+      )
+      .background(
+        color = MaterialTheme.colorScheme.primaryContainer,
         shape = MaterialTheme.shapes.extraLarge
       )
       .padding(horizontal = 10.dp)

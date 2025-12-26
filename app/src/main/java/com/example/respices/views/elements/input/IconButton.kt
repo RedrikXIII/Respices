@@ -1,6 +1,7 @@
 package com.example.respices.views.elements.input
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -34,6 +35,10 @@ fun IconButton(
         .padding(2.dp)
         .fillMaxHeight()
         .aspectRatio(1.0f)
+        .background(
+          color = MaterialTheme.colorScheme.onTertiary,
+          shape = MaterialTheme.shapes.small
+        )
         .clip(MaterialTheme.shapes.small)
     ) {
       Image(

@@ -3,6 +3,7 @@ package com.example.respices.views.elements.input
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -145,6 +148,9 @@ fun DurationPicker(
             color = Color.Black,
             width = 1.dp
           )
+          .background(
+            color = MaterialTheme.colorScheme.surface
+          )
           .padding(all = 10.dp)
           .clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -216,7 +222,13 @@ fun DurationPicker(
           placeholder = { Text(text = curHours) },
           singleLine = true,
           colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = Color.Black
+            cursorColor = Color.Black,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            selectionColors = TextSelectionColors(
+              handleColor = MaterialTheme.colorScheme.onSurface,
+              backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            )
           ),
           modifier = Modifier
             .bringIntoViewRequester(bringIntoViewRequester)
@@ -263,6 +275,9 @@ fun DurationPicker(
           .height(60.dp)
           .width(70.dp)
           .graphicsLayer { clip = true }
+          .background(
+            color = MaterialTheme.colorScheme.surface
+          )
           .border(
             color = Color.Black,
             width = 1.dp
@@ -322,7 +337,13 @@ fun DurationPicker(
           placeholder = { Text(text = curMinutes) },
           singleLine = true,
           colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = Color.Black
+            cursorColor = Color.Black,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            selectionColors = TextSelectionColors(
+              handleColor = MaterialTheme.colorScheme.onSurface,
+              backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            )
           ),
           modifier = Modifier
             .bringIntoViewRequester(bringIntoViewRequester)

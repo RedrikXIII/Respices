@@ -1,7 +1,9 @@
 package com.example.respices.views.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -31,6 +33,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -58,6 +61,8 @@ fun MealDelete(
   recipeViewModel: RecipeViewModel = viewModel()
 ) {
   RespicesTheme {
+    val context = LocalContext.current
+
     val copyMeal = remember { mutableStateOf(getEmptyMeal()) }
     val isDeleted = remember { mutableStateOf(false) }
 
@@ -160,6 +165,8 @@ fun MealDelete(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
           ) {
+            Toast.makeText(context, "Meal deleted!", Toast.LENGTH_SHORT).show()
+
             isDeleted.value = true
             recipeViewModel.deleteMeal(copyMeal.value.recipe)
             GlobalState.setCurrentMeal(null)
@@ -173,6 +180,10 @@ fun MealDelete(
             .wrapContentWidth()
             .wrapContentHeight()
             .padding(top = 20.dp)
+            .background(
+              color = MaterialTheme.colorScheme.onTertiary,
+              shape = MaterialTheme.shapes.large
+            )
             .border(
               color = Color.Black,
               width = 1.dp,
@@ -277,6 +288,8 @@ fun MealDelete(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
           ) {
+            Toast.makeText(context, "Reverted deletion!", Toast.LENGTH_SHORT).show()
+
             isDeleted.value = false
             recipeViewModel.upsertMeal(
               copyMeal.value.recipe,
@@ -294,6 +307,10 @@ fun MealDelete(
             .wrapContentWidth()
             .wrapContentHeight()
             .padding(top = 20.dp)
+            .background(
+              color = MaterialTheme.colorScheme.onTertiary,
+              shape = MaterialTheme.shapes.large
+            )
             .border(
               color = Color.Black,
               width = 1.dp,

@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -100,6 +102,12 @@ fun GlobalSearchBar() {
             focusedBorderColor = Color.Black,
             unfocusedBorderColor = Color.Black,
             cursorColor = Color.Black,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            selectionColors = TextSelectionColors(
+              handleColor = MaterialTheme.colorScheme.onPrimary,
+              backgroundColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+            )
           ),
           textStyle = TextStyle(
             fontSize = 20.sp
@@ -107,7 +115,7 @@ fun GlobalSearchBar() {
           modifier = Modifier
             .focusRequester(focusRequester)
             .background(
-              color = Color.White,
+              color = MaterialTheme.colorScheme.primaryContainer,
               shape = HeightBasedRoundedShape()
             )
             .fillMaxWidth()
@@ -140,7 +148,7 @@ fun GlobalSearchBar() {
                     shape = HeightBasedRoundedShape()
                   )
                   .background(
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = HeightBasedRoundedShape()
                   )
                   .padding(horizontal = 10.dp)

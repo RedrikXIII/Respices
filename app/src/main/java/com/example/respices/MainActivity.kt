@@ -91,8 +91,9 @@ class MainActivity : ComponentActivity() {
 
     onBackPressedDispatcher.addCallback(this) {
       if (!GlobalState.goToPrevScreen()) {
-        isEnabled = false
-        onBackPressedDispatcher.onBackPressed()
+        Log.d("go back test", "default to quit")
+
+        finish()
       }
     }
 
@@ -122,7 +123,8 @@ class MainActivity : ComponentActivity() {
         )
 
         LaunchedEffect(Unit) {
-          PopulateDatabase(recipeViewModel)
+          //PopulateDatabase(recipeViewModel)
+          LoadMeals(recipeViewModel)
         }
 
         CompositionLocalProvider(LocalRecipeViewModel provides recipeViewModel) {
@@ -237,7 +239,12 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  fun LoadMeals(recipeViewModel: RecipeViewModel) {
+    recipeViewModel.loadAllMeals()
+  }
+
   fun PopulateDatabase(recipeViewModel: RecipeViewModel) {
+    /*
     LoggerService.log("MainActivity: populating the database...", this)
 
     recipeViewModel.clearAll {
@@ -303,6 +310,7 @@ class MainActivity : ComponentActivity() {
 
       LoggerService.log("MainActivity: populated the database", this)
     }
+    */
   }
 
   @RequiresApi(Build.VERSION_CODES.Q)

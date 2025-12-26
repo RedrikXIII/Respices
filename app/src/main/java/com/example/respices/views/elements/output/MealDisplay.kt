@@ -1,12 +1,14 @@
 package com.example.respices.views.elements.output
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -41,6 +43,7 @@ import com.example.respices.support.services.SearchBarManager
 import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.views.elements.HorizontalLine
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MealDisplay(
   meal: Meal
@@ -51,6 +54,9 @@ fun MealDisplay(
       .fillMaxWidth()
       .wrapContentHeight()
       .padding(10.dp)
+      .background(
+        color = MaterialTheme.colorScheme.secondaryContainer
+      )
       .border(
         color = Color.Black,
         width = 1.dp
@@ -104,6 +110,10 @@ fun MealDisplay(
             .wrapContentHeight()
             .wrapContentWidth()
             .padding(vertical = 5.dp, horizontal = 5.dp)
+            .background(
+              color = MaterialTheme.colorScheme.secondary,
+              shape = HeightBasedRoundedShape()
+            )
             .border(
               width = 1.dp,
               color = Color(0xFF000000),
@@ -147,6 +157,10 @@ fun MealDisplay(
             .wrapContentHeight()
             .wrapContentWidth()
             .padding(vertical = 5.dp, horizontal = 5.dp)
+            .background(
+              color = MaterialTheme.colorScheme.secondary,
+              shape = HeightBasedRoundedShape()
+            )
             .border(
               width = 1.dp,
               color = Color(0xFF000000),
