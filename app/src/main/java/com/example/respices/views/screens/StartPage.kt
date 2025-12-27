@@ -67,7 +67,7 @@ fun StartPage(
     val selectedIngredients = remember { mutableStateListOf<String>() }
     val selectedTags = remember { mutableStateListOf<String>() }
 
-    val selectedTime = remember { mutableLongStateOf(1439) }
+    val selectedTime = remember { mutableLongStateOf(5999) }
 
     val availableMeals by remember(
       allMealsState,
@@ -194,7 +194,7 @@ fun StartPage(
       )
 
       DurationPicker(
-        initialTime = 1439,
+        initialTime = 5999,
         onConfirm = { time ->
           suggestedMeals.clear()
           selectedTime.longValue = time

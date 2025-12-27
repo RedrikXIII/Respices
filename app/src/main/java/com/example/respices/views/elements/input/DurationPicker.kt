@@ -68,7 +68,7 @@ fun DurationPicker(
 ) {
   var curTime by remember { mutableLongStateOf(initialTime) }
 
-  val ih = max(min(curTime.div(60L), 23L), 0L).toString()
+  val ih = max(min(curTime.div(60L), 99L), 0L).toString()
   val im0 = max(min(curTime.mod(60L), 59L), 0L)
   val im = "${im0.div(10L)}${im0.mod(10L)}"
 
@@ -109,7 +109,7 @@ fun DurationPicker(
   LaunchedEffect(initialTime) {
     curTime = initialTime
 
-    val ihi = max(min(curTime.div(60L), 23L), 0L).toString()
+    val ihi = max(min(curTime.div(60L), 99L), 0L).toString()
     val im0i = max(min(curTime.mod(60L), 59L), 0L)
     val imi = "${im0i.div(10L)}${im0i.mod(10L)}"
 
@@ -185,7 +185,7 @@ fun DurationPicker(
                   Log.d("time picker test", "selection changed: ${newInput.selection}")
                 }
 
-                val nit = max(min(curHoursLong, 23L), 0L)
+                val nit = max(min(curHoursLong, 99L), 0L)
                 curTime = nit * 60 + curTime.mod(60)
                 curHours = nit.toString()
               }
