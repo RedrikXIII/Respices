@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -81,6 +82,29 @@ fun MealList(
         .wrapContentHeight()
         .padding(bottom = 20.dp)
     ) {
+      if (allMealsState.isEmpty()) {
+        Column(
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 40.dp)
+            .wrapContentHeight()
+        ) {
+          Image(
+            painter = painterResource(R.drawable.serving_dish_empty),
+            contentDescription = "empty meal list",
+            modifier = Modifier
+              .height(120.dp)
+              .width(120.dp)
+              .padding(bottom = 30.dp)
+          )
+          Text(
+            text = "Oops, no meals!",
+            fontSize = 30.sp
+          )
+        }
+      }
+
       loadedMeals.forEach {meal ->
         MealDisplay(meal)
       }

@@ -122,6 +122,8 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
 
                 delay(50)
               }
+
+              recipeViewModel.loadAllMeals { }
             }
           }
         }

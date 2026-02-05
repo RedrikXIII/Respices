@@ -3,9 +3,11 @@ package com.example.respices.support.services
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -14,9 +16,9 @@ import java.util.Date
 object LoggerService {
   private var uri: Uri? = null
 
-  // IMPORTANT
-  private val isOn: Boolean = false
+  private val isOn: Boolean = true
 
+  @RequiresApi(Build.VERSION_CODES.Q)
   fun init(context: Context) {
     if (isOn) {
       val contentValues = ContentValues().apply {

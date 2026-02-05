@@ -44,6 +44,7 @@ import com.example.respices.ui.theme.RespicesTheme
 
 @Composable
 fun GlobalSearchBar() {
+  // state accessed from Search Bar Manager
   val options = SearchBarManager.curOptions
   val exclude = SearchBarManager.excludeOptions
   val placeholder = SearchBarManager.curPlaceholder
@@ -53,6 +54,7 @@ fun GlobalSearchBar() {
   val focusRequester = remember { FocusRequester() }
 
   RespicesTheme {
+    // appear only if Search Bar is currently active
     if (isActive) {
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,8 +67,11 @@ fun GlobalSearchBar() {
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
           ) {
+            // once clicked outside of the search field,
+            // search bar is closed and result of the search is returned
             SearchBarManager.closeSearchBar()
           }
+          // ...
       ) {
         OutlinedTextField(
           value = curInput,

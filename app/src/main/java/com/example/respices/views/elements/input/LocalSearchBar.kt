@@ -35,7 +35,7 @@ fun LocalSearchBar(
   exclude: List<String> = listOf(),
   onComplete: (String) -> Unit) {
 
-  var isTyping by remember {mutableStateOf(false) }
+  var isTyping by remember { mutableStateOf(false) }
 
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -85,5 +85,4 @@ fun LocalSearchBar(
         .padding(horizontal = 10.dp)
     )
   }
-
 }

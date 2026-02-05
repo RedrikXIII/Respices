@@ -5,6 +5,6 @@ enum class Screen {
   MEAL_LIST,
   MEAL_VIEW,
   MEAL_EDIT,
-  CSV_VIEW,
+  FILE_VIEW,
   MEAL_DELETE
 }

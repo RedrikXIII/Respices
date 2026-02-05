@@ -18,13 +18,17 @@ import androidx.compose.ui.unit.dp
 import com.example.respices.R
 import com.example.respices.ui.theme.RespicesTheme
 
+// Re-usable @Composable function for a button with an icon inside
 @Composable
 fun IconButton(
   icon: Int?,
   modifier: Modifier = Modifier,
   imageModifier: Modifier = Modifier
 ) {
+  // applies coloring and global styles
   RespicesTheme {
+    // container for the image
+    // handles clicks
     Box (
       modifier = modifier
         .border(
@@ -41,6 +45,7 @@ fun IconButton(
         )
         .clip(MaterialTheme.shapes.small)
     ) {
+      // displays the icon
       Image(
         painter = painterResource(icon ?: R.drawable.baseline_question_mark_24),
         contentDescription = "Icon!",

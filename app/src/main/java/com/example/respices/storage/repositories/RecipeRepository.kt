@@ -14,6 +14,7 @@ import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
 import com.example.respices.support.services.LoggerService
 
+// Recipe Repository
 class RecipeRepository(
   private val recipeDao: RecipeDao,
   private val ingredientDao: IngredientDao,
@@ -23,11 +24,7 @@ class RecipeRepository(
 ) {
   @Transaction
   suspend fun insertMeal(recipe: Recipe, ingredients: List<Ingredient>, tags: List<Tag>): Long {
-    LoggerService.log("RecipeRepository: inserting a new meal...", context)
-
     val recipeId = recipeDao.insert(recipe)
-
-    LoggerService.log("RecipeRepository: inserted a new recipe", context)
 
     ingredients.forEach { ingredientI ->
       val ingredient = ingredientI.copy(name = ingredientI.name.lowercase())
@@ -42,8 +39,6 @@ class RecipeRepository(
       }
     }
 
-    LoggerService.log("RecipeRepository: inserted all ingredients", context)
-
     tags.forEach { tagI ->
       val tag = tagI.copy(name = tagI.name.lowercase())
 
@@ -57,23 +52,17 @@ class RecipeRepository(
       }
     }
 
-    LoggerService.log("RecipeRepository: inserted all tags", context)
-
     return recipeId
   }
 
   @Transaction
   suspend fun deleteMeal(recipe: Recipe) {
-    LoggerService.log("RecipeRepository: deleting a meal...", context)
-
     val ingredientIds: List<Long> = crossRefDao.loadAllRIByRecipe(recipe.recipeId)
       .map { it.ingredientId }
     val tagIds: List<Long> = crossRefDao.loadAllRTByRecipe(recipe.recipeId)
       .map { it.tagId }
 
     recipeDao.delete(recipe)
-
-    LoggerService.log("RecipeRepository: deleted a recipe", context)
 
     ingredientIds.forEach { ingredientId ->
       ingredientDao.loadById(ingredientId)?.let { ingredient ->
@@ -83,8 +72,6 @@ class RecipeRepository(
       }
     }
 
-    LoggerService.log("RecipeRepository: deleted all single ingredients", context)
-
     tagIds.forEach { tagId ->
       tagDao.loadById(tagId)?.let { tag ->
         if (crossRefDao.countTagCrossRefsById(tagId) == 0L) {
@@ -92,35 +79,25 @@ class RecipeRepository(
         }
       }
     }
-
-    LoggerService.log("RecipeRepository: deleted all single tags", context)
   }
 
   suspend fun loadMealById(id: Long): Meal? {
-    LoggerService.log("RecipeRepository: loading a meal by id...", context)
     val result = recipeDao.loadMealById(id)
-    LoggerService.log("RecipeRepository: loaded a meal by id", context)
     return result
   }
 
   suspend fun loadAllMeals(): List<Meal> {
-    LoggerService.log("RecipeRepository: loading all meals...", context)
     val result = recipeDao.loadAllMeals()
-    LoggerService.log("RecipeRepository: loaded all meals", context)
     return result
   }
 
   suspend fun loadAllTags(): List<Tag> {
-    LoggerService.log("RecipeRepository: loading all tags...", context)
     val result = tagDao.loadAll()
-    LoggerService.log("RecipeRepository: loaded all tags", context)
     return result
   }
 
   suspend fun loadAllIngredients(): List<Ingredient> {
-    LoggerService.log("RecipeRepository: loading all ingredients...", context)
     val result = ingredientDao.loadAll().toList()
-    LoggerService.log("RecipeRepository: loaded all ingredients", context)
     return result
   }
 

@@ -12,6 +12,7 @@ import com.example.respices.storage.crossrefs.RecipeIngredientCrossRef
 import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Meal
 
+// Recipe DAO
 @Dao
 interface RecipeDao {
   // Basic CRUD

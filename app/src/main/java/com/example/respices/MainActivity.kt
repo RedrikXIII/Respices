@@ -72,40 +72,40 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
+// Root class that hosts the application
 class MainActivity : ComponentActivity() {
+  @RequiresApi(Build.VERSION_CODES.Q)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    //Toast.makeText(this, "App Start", Toast.LENGTH_SHORT).show()
+    // initializing crash logging
+    setupCrashLogging()
 
-    //setupCrashLogging()
-
-    //Toast.makeText(this, "Crash Log", Toast.LENGTH_SHORT).show()
-
-    LoggerService.init(this)
-    LoggerService.log("MainActivity: Logger started", this)
-
-    //Toast.makeText(this, "Logger Service", Toast.LENGTH_SHORT).show()
-
+    // overriding default "go back" event
     onBackPressedDispatcher.addCallback(this) {
       if (!GlobalState.goToPrevScreen()) {
-        Log.d("go back test", "default to quit")
-
+        // if no screen to go back to,
+        // revert to default "go back" behaviour
         finish()
       }
     }
 
     setContent {
+      // anything inside RespicesTheme {} will have custom colour theme applied
       RespicesTheme {
-
+        // utility for executing lambda functions
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val activity = context as ComponentActivity
 
         val focusManager = LocalFocusManager.current
 
+        // initializing logger service
+        LoggerService.init(context)
+
+        // getting an existing/new instance of the database
         val repository = remember {
           val db = AppDatabase.getInstance(context)
           RecipeRepository(
@@ -117,16 +117,19 @@ class MainActivity : ComponentActivity() {
           )
         }
 
+        // initializing the RecipeViewModel
         val recipeViewModel: RecipeViewModel = viewModel(
           viewModelStoreOwner = activity,
           factory = RecipeViewModelFactory(repository, application)
         )
 
+        // At the start of the application,
+        // load all meals from the database into ViewModel
         LaunchedEffect(Unit) {
-          //PopulateDatabase(recipeViewModel)
           LoadMeals(recipeViewModel)
         }
 
+        // Initializing UI
         CompositionLocalProvider(LocalRecipeViewModel provides recipeViewModel) {
           Surface(
             modifier = Modifier.fillMaxSize(),
@@ -138,13 +141,16 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(top = 40.dp)
                 .focusable()
+                // clear focus from any UI element
+                // by tapping on the rest of the screen
                 .pointerInput(Unit) {
                   detectTapGestures(onTap = {
-                    Log.d("global focus clear", "globally cleared focus")
                     focusManager.clearFocus(force = true)
                   })
                 }
             ) {
+              // separate element
+              // that is displayed at the top of the screen
               TopBar()
 
               Box(
@@ -156,12 +162,13 @@ class MainActivity : ComponentActivity() {
                 var bottomReached by remember { mutableStateOf(false) }
                 val bottomReachedDelay = 250L
 
+                // detecting a screen change
                 LaunchedEffect(GlobalState.currentScreen.value) {
                   scrollState.scrollTo(0)
 
                   if (GlobalState.currentScreen.value == Screen.START_PAGE ||
                       GlobalState.currentScreen.value == Screen.MEAL_LIST ||
-                      GlobalState.currentScreen.value == Screen.CSV_VIEW) {
+                      GlobalState.currentScreen.value == Screen.FILE_VIEW) {
                     GlobalState.setCurrentMeal(null)
                   }
                 }
@@ -173,16 +180,18 @@ class MainActivity : ComponentActivity() {
                     .verticalScroll(scrollState)
                     .imePadding()
                 ) {
+                  // deciding which screen to display based on current screen selected
                   when (GlobalState.currentScreen.value) {
                     Screen.START_PAGE -> StartPage(bottomReached)
                     Screen.MEAL_LIST -> MealList(bottomReached)
                     Screen.MEAL_VIEW -> MealView(GlobalState.currentMeal.value)
                     Screen.MEAL_EDIT -> MealEdit(GlobalState.currentMeal.value)
-                    Screen.CSV_VIEW -> FileView()
+                    Screen.FILE_VIEW -> FileView()
                     Screen.MEAL_DELETE -> MealDelete(GlobalState.currentMeal.value)
                   }
                 }
 
+                // detecting whether to display "go up" button
                 if (scrollState.value > 50) {
                   Box(
                     modifier = Modifier
@@ -209,11 +218,14 @@ class MainActivity : ComponentActivity() {
                   }
                 }
 
+                // hidden element that appears only when search of tags/ingredients is performed
                 GlobalSearchBar()
 
+                // detecting when the bottom of the screen was reached
                 LaunchedEffect(scrollState.value, scrollState.maxValue) {
                   if (scrollState.maxValue == 0) {
                     while (scrollState.maxValue == 0) {
+                      // signaling the rest of UI that relies on bottom detection
                       bottomReached = true
                       delay(bottomReachedDelay*1/10)
                       bottomReached = false
@@ -222,6 +234,7 @@ class MainActivity : ComponentActivity() {
                   }
                   if (scrollState.value >= scrollState.maxValue && !bottomReached) {
                     while (scrollState.value >= scrollState.maxValue) {
+                      // signaling the rest of UI that relies on bottom detection
                       bottomReached = true
                       delay(bottomReachedDelay*1/10)
                       bottomReached = false
@@ -239,12 +252,19 @@ class MainActivity : ComponentActivity() {
     }
   }
 
+  // load all the meals from the database into
   fun LoadMeals(recipeViewModel: RecipeViewModel) {
     recipeViewModel.loadAllMeals()
   }
 
+  // clears the database
+  fun ClearDatabase(recipeViewModel: RecipeViewModel) {
+    recipeViewModel.clearAll {}
+  }
+
+  // populates the database with a set of test meals
   fun PopulateDatabase(recipeViewModel: RecipeViewModel) {
-    /*
+
     LoggerService.log("MainActivity: populating the database...", this)
 
     recipeViewModel.clearAll {
@@ -310,9 +330,10 @@ class MainActivity : ComponentActivity() {
 
       LoggerService.log("MainActivity: populated the database", this)
     }
-    */
+
   }
 
+  // sets up logging into a file in case of a crash
   @RequiresApi(Build.VERSION_CODES.Q)
   private fun setupCrashLogging() {
     Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->

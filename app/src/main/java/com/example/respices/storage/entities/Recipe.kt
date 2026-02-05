@@ -3,6 +3,7 @@ package com.example.respices.storage.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// Recipe Entity
 @Entity(tableName = "recipes")
 data class Recipe(
   @PrimaryKey(autoGenerate = true) val recipeId: Long = 0L,

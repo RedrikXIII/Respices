@@ -105,34 +105,40 @@ fun MealEdit(
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
 
+    // store initial and current state and information about the selected meal
     val meal = remember { mutableStateOf<Meal>(getEmptyMeal()) }
     val initialMeal = remember { mutableStateOf<Meal>(getEmptyMeal()) }
-    val isRewindConfirmed = remember { mutableStateOf(false) }
-    val isNewMeal = remember { mutableStateOf<Boolean>(false) }
+    val isNewMeal = remember { mutableStateOf<Boolean>(true) }
     val mealFault = remember { mutableStateOf(MealFault.NONE) }
 
+    // store all ingredients for fast search and lookup
     val allIngredientsState by recipeViewModel.allIngredients.collectAsStateWithLifecycle()
     val allIngredients: List<String> = allIngredientsState.map { i -> i.name }
 
+    // store all tags for fast search and lookup
     val allTagsState by recipeViewModel.allTags.collectAsStateWithLifecycle()
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
+    // store input data about the meal
     val mealIngredients = remember { mutableStateListOf<String>() }
     val mealTags = remember { mutableStateListOf<String>() }
     val mealTime = remember { mutableLongStateOf(0L) }
-
     var ratingFieldValue by remember { mutableStateOf(TextFieldValue()) }
 
+    // used to prevent multiple fast updates
     val isUpdateBlocked = remember { mutableStateOf(false) }
 
+    // manage focus of input fields
     val wasNameFocused = remember { mutableStateOf(false) }
     val wasRatingFocused = remember { mutableStateOf(false) }
     val wasStepsFocused = remember { mutableStateOf(false) }
     val wasLinkFocused = remember { mutableStateOf(false) }
     val wasRewindFocused = remember { mutableStateOf(false) }
 
+    // manage rewind
     val rewindFocusRequester = remember { FocusRequester() }
     val rewindInteractionSource = remember { MutableInteractionSource() }
+    val isRewindConfirmed = remember { mutableStateOf(false) }
 
     val isChangesToast = remember { mutableStateOf(true) }
 
@@ -815,7 +821,7 @@ fun MealEdit(
         keyboardOptions = KeyboardOptions(
           showKeyboardOnFocus = true,
           keyboardType = KeyboardType.Text,
-          imeAction = ImeAction.Done
+          imeAction = ImeAction.Default
         ),
         textStyle = TextStyle(
           fontSize = 22.sp,
@@ -833,8 +839,8 @@ fun MealEdit(
           focusedTextColor = Color.Black,
           unfocusedTextColor = Color.Black,
           selectionColors = TextSelectionColors(
-            handleColor = MaterialTheme.colorScheme.onSurface,
-            backgroundColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            handleColor = MaterialTheme.colorScheme.onSecondary,
+            backgroundColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.3f)
           )
         ),
         modifier = Modifier

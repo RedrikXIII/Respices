@@ -105,9 +105,13 @@ fun StartPage(
     LaunchedEffect(bottomReached) {
       if (bottomReached) {
         if (suggestedMeals.size < availableMeals.size) {
+          // if there are meals left to be added
+
+          // very high value as default for minimum
           var lowestSuggested: Double = 1000.0
 
           if (suggestedMeals.size > 0) {
+            // if lowest element exists, use its index instead
             lowestSuggested = suggestedMeals[suggestedMeals.size - 1]
               .acceptanceIndex(
                 selectedTags.map { name ->
@@ -116,6 +120,7 @@ fun StartPage(
               )
           }
 
+          // finding the highest value out of meals that haven't been suggested
           var highest: Double = -1000.0
           availableMealsIndex.value.forEachIndexed { index, value ->
             if (value > highest && value < lowestSuggested) {
@@ -123,6 +128,8 @@ fun StartPage(
             }
           }
 
+          // to prevent same meal being added multiple times,
+          // all meals with the same index are suggested
           availableMeals.forEachIndexed { index, meal ->
             if (highest == availableMealsIndex.value[index]) {
               suggestedMeals.add(meal)
