@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+// Ingredient Entity
 @Entity(
   tableName = "ingredients",
   indices = [

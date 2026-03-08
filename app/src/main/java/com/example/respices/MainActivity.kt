@@ -1,16 +1,10 @@
 package com.example.respices
 
-import android.content.ContentValues
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,7 +47,6 @@ import com.example.respices.storage.entities.Tag
 import com.example.respices.storage.repositories.RecipeRepository
 import com.example.respices.support.enums.Screen
 import com.example.respices.support.services.GlobalState
-import com.example.respices.support.services.LoggerService
 import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.LocalRecipeViewModel
@@ -69,43 +62,34 @@ import com.example.respices.views.screens.MealView
 import com.example.respices.views.screens.StartPage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
 
 // Root class that hosts the application
 class MainActivity : ComponentActivity() {
-  @RequiresApi(Build.VERSION_CODES.Q)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    // initializing crash logging
-    setupCrashLogging()
-
-    // overriding default "go back" event
+    // Overriding default "go back" event
     onBackPressedDispatcher.addCallback(this) {
       if (!GlobalState.goToPrevScreen()) {
-        // if no screen to go back to,
-        // revert to default "go back" behaviour
+        // If no screen to go back to,
+        // Revert to default "go back" behaviour
         finish()
       }
     }
 
     setContent {
-      // anything inside RespicesTheme {} will have custom colour theme applied
+      // Anything inside RespicesTheme {} will have custom colour theme applied
       RespicesTheme {
-        // utility for executing lambda functions
+        // Utility for executing lambda functions
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val activity = context as ComponentActivity
 
         val focusManager = LocalFocusManager.current
 
-        // initializing logger service
-        LoggerService.init(context)
-
-        // getting an existing/new instance of the database
+        // Getting an existing/new instance of the database
         val repository = remember {
           val db = AppDatabase.getInstance(context)
           RecipeRepository(
@@ -117,14 +101,14 @@ class MainActivity : ComponentActivity() {
           )
         }
 
-        // initializing the RecipeViewModel
+        // Initializing the RecipeViewModel
         val recipeViewModel: RecipeViewModel = viewModel(
           viewModelStoreOwner = activity,
           factory = RecipeViewModelFactory(repository, application)
         )
 
         // At the start of the application,
-        // load all meals from the database into ViewModel
+        // Load all meals from the database into ViewModel
         LaunchedEffect(Unit) {
           LoadMeals(recipeViewModel)
         }
@@ -141,7 +125,7 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .padding(top = 40.dp)
                 .focusable()
-                // clear focus from any UI element
+                // Clear focus from any UI element
                 // by tapping on the rest of the screen
                 .pointerInput(Unit) {
                   detectTapGestures(onTap = {
@@ -149,10 +133,10 @@ class MainActivity : ComponentActivity() {
                   })
                 }
             ) {
-              // separate element
-              // that is displayed at the top of the screen
+              // UI element that is displayed at the top of the screen
               TopBar()
 
+              // Screen Container
               Box(
                 modifier = Modifier
                   .fillMaxWidth()
@@ -162,7 +146,7 @@ class MainActivity : ComponentActivity() {
                 var bottomReached by remember { mutableStateOf(false) }
                 val bottomReachedDelay = 250L
 
-                // detecting a screen change
+                // Detect a screen change
                 LaunchedEffect(GlobalState.currentScreen.value) {
                   scrollState.scrollTo(0)
 
@@ -180,7 +164,7 @@ class MainActivity : ComponentActivity() {
                     .verticalScroll(scrollState)
                     .imePadding()
                 ) {
-                  // deciding which screen to display based on current screen selected
+                  // Decide which screen to display based on current screen selected
                   when (GlobalState.currentScreen.value) {
                     Screen.START_PAGE -> StartPage(bottomReached)
                     Screen.MEAL_LIST -> MealList(bottomReached)
@@ -191,7 +175,7 @@ class MainActivity : ComponentActivity() {
                   }
                 }
 
-                // detecting whether to display "go up" button
+                // Detect whether to display "go up" button
                 if (scrollState.value > 50) {
                   Box(
                     modifier = Modifier
@@ -218,14 +202,14 @@ class MainActivity : ComponentActivity() {
                   }
                 }
 
-                // hidden element that appears only when search of tags/ingredients is performed
+                // Hidden element that appears only when search of tags/ingredients is performed
                 GlobalSearchBar()
 
-                // detecting when the bottom of the screen was reached
+                // Detect when the bottom of the screen was reached
                 LaunchedEffect(scrollState.value, scrollState.maxValue) {
                   if (scrollState.maxValue == 0) {
                     while (scrollState.maxValue == 0) {
-                      // signaling the rest of UI that relies on bottom detection
+                      // Signal the rest of UI that relies on bottom detection
                       bottomReached = true
                       delay(bottomReachedDelay*1/10)
                       bottomReached = false
@@ -234,7 +218,7 @@ class MainActivity : ComponentActivity() {
                   }
                   if (scrollState.value >= scrollState.maxValue && !bottomReached) {
                     while (scrollState.value >= scrollState.maxValue) {
-                      // signaling the rest of UI that relies on bottom detection
+                      // Signal the rest of UI that relies on bottom detection
                       bottomReached = true
                       delay(bottomReachedDelay*1/10)
                       bottomReached = false
@@ -252,24 +236,20 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  // load all the meals from the database into
+  // Load all the meals from the database into RecipeViewModel
   fun LoadMeals(recipeViewModel: RecipeViewModel) {
     recipeViewModel.loadAllMeals()
   }
 
-  // clears the database
+  // Clear the database (DEBUG ONLY)
   fun ClearDatabase(recipeViewModel: RecipeViewModel) {
     recipeViewModel.clearAll {}
   }
 
-  // populates the database with a set of test meals
+  // Populate the database with a set of test meals (DEBUG ONLY)
   fun PopulateDatabase(recipeViewModel: RecipeViewModel) {
 
-    LoggerService.log("MainActivity: populating the database...", this)
-
     recipeViewModel.clearAll {
-      LoggerService.log("MainActivity: deleted all left-over meals", this)
-
       recipeViewModel.insertMeal(
         Recipe(
           name = "Recipe C1",
@@ -327,36 +307,6 @@ class MainActivity : ComponentActivity() {
           Tag(name = "long")
         )
       )
-
-      LoggerService.log("MainActivity: populated the database", this)
-    }
-
-  }
-
-  // sets up logging into a file in case of a crash
-  @RequiresApi(Build.VERSION_CODES.Q)
-  private fun setupCrashLogging() {
-    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-      // Prepare content values for MediaStore
-      val contentValues = ContentValues().apply {
-        put(MediaStore.Downloads.DISPLAY_NAME, "respices_crash_log.txt")
-        put(MediaStore.Downloads.MIME_TYPE, "text/plain")
-        put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-      }
-
-      val resolver = this.contentResolver
-      val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
-      if (uri != null) {
-        resolver.openOutputStream(uri, "wa")?.use { outputStream ->
-          val formatter = SimpleDateFormat.getTimeInstance()
-          val date = Date()
-          val current = formatter.format(date)
-
-          outputStream.write("\n--- Respices Crash at $current ---\n".toByteArray())
-          outputStream.write(throwable.stackTraceToString().toByteArray())
-        }
-      }
     }
   }
 }

@@ -48,6 +48,7 @@ import com.example.respices.views.elements.input.LocalSearchBar
 import com.example.respices.views.elements.output.EditableList
 import com.example.respices.views.elements.output.MealDisplay
 
+// UI Screen to select ingredients, tags and time and perform meal selection
 @Composable
 fun StartPage(
   bottomReached: Boolean,
@@ -57,18 +58,22 @@ fun StartPage(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
+    // List of all existing ingredients
     val allIngredientsState by recipeViewModel.allIngredients.collectAsStateWithLifecycle()
     val allIngredients: List<String> = allIngredientsState.map { i -> i.name }
 
+    // List of all existing tags
     val allTagsState by recipeViewModel.allTags.collectAsStateWithLifecycle()
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
+    // List of all existing meals
     val allMealsState by recipeViewModel.allMeals.collectAsStateWithLifecycle()
     val selectedIngredients = remember { mutableStateListOf<String>() }
     val selectedTags = remember { mutableStateListOf<String>() }
 
     val selectedTime = remember { mutableLongStateOf(5999) }
 
+    // Meals filtered by time and ingredients
     val availableMeals by remember(
       allMealsState,
       selectedTime.longValue,
@@ -87,11 +92,14 @@ fun StartPage(
       }
     }
 
-
+    // Caching acceptanceIndex for all meals
     val availableMealsIndex = remember(availableMeals) {
       derivedStateOf {
+        // Mapping acceptanceIndex to meal
         availableMeals.map { meal ->
+          // Calculating acceptanceIndex for a specific meal
           meal.acceptanceIndex(
+            // Mapping tag names to tags for acceptanceIndex
             selectedTags.map { name ->
               Tag(0, name)
             }
@@ -102,6 +110,7 @@ fun StartPage(
 
     val suggestedMeals = remember { mutableStateListOf<Meal>() }
 
+    // Loading next meal when bottom of the screen reached
     LaunchedEffect(bottomReached) {
       if (bottomReached) {
         if (suggestedMeals.size < availableMeals.size) {
@@ -148,6 +157,7 @@ fun StartPage(
           })
         }
     ) {
+      // Ingredient Selection
       LocalSearchBar(
         placeholder = "Ingredients...",
         options = allIngredients,
@@ -174,6 +184,7 @@ fun StartPage(
           .height(40.dp)
       )
 
+      // Tag Selection
       LocalSearchBar(
         placeholder = "Tags...",
         options = allTags,
@@ -200,6 +211,7 @@ fun StartPage(
           .height(40.dp)
       )
 
+      // Time Selection
       DurationPicker(
         initialTime = 5999,
         onConfirm = { time ->
@@ -219,6 +231,7 @@ fun StartPage(
       )
 
       if (availableMeals.isEmpty()) {
+        // Error message if no meals are available in the selection
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
           modifier = Modifier
@@ -240,6 +253,7 @@ fun StartPage(
           )
         }
       } else {
+        // Display list of available meals
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
           modifier = Modifier
@@ -251,6 +265,7 @@ fun StartPage(
             MealDisplay(meal)
           }
 
+          // Show arrow down while meals left to load
           if (suggestedMeals.size < availableMeals.size) {
             if (suggestedMeals.size == 0) {
               Spacer(

@@ -26,6 +26,7 @@ import com.example.respices.support.services.GlobalState
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.views.elements.input.IconButton
 
+// UI element always available at the top of the screen for navigation
 @Composable
 fun TopBar() {
   RespicesTheme {
@@ -50,6 +51,7 @@ fun TopBar() {
           .weight(1f)
       )
 
+      // Retrieve currently visited screen
       val curScreen: Screen by GlobalState.currentScreen
       val panel = GlobalLookup.screenToTopBarScreens[curScreen]
       Row (
@@ -59,10 +61,12 @@ fun TopBar() {
           .wrapContentWidth()
           .height(60.dp)
       ) {
+        // Display appropriate buttons for each of the 3 navigation options
         IconButton(
           panel?.first?.second,
           modifier = Modifier
             .clickable {
+              // When clicked, navigate to the selected screen
               panel?.first?.let { GlobalState.setCurrentScreen(it.first) }
             }
         )

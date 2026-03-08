@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.support.services.SearchBarManager
 
+// UI Element for invoking GlobalSearchBar and interacting with the result
 @Composable
 fun LocalSearchBar(
   placeholder: String,
@@ -51,6 +52,7 @@ fun LocalSearchBar(
           exclude = exclude,
           placeholder = placeholder,
           onDone = { final ->
+            // Executing the function when a result from search is available
             onComplete.invoke(final)
             isTyping = false
           }

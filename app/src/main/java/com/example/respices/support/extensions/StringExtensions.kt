@@ -1,11 +1,11 @@
 package com.example.respices.support.extensions
 
-import android.util.Log
 import com.example.respices.support.classes.MealData
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
+// Calculate similarity between 2 strings
 fun String.getSimilarity(str2I: String): Double {
   val str1 = this.lowercase()
   val str2 = str2I.lowercase()
@@ -29,23 +29,7 @@ fun String.getSimilarity(str2I: String): Double {
   return result
 }
 
-fun String.replaceTyping(newStr: String): String {
-  if (newStr.length - this.length == 1) {
-    this.forEachIndexed { index, value ->
-      if (value != newStr[index]) {
-        var res: String = newStr.substring(startIndex = 0, endIndex = index + 1)
-        if (index < this.length - 1) {
-          res += newStr.substring(startIndex = index + 2, endIndex = newStr.length)
-        }
-
-        return res
-      }
-    }
-  }
-
-  return newStr
-}
-
+// Return a string from typing as if it was in "insert" mode
 fun String.replaceTyping(newStr: String, cursor: Int): String {
   if (cursor >= 0 && cursor <= newStr.length) {
     if (newStr.length - this.length == 1) {
@@ -61,6 +45,7 @@ fun String.replaceTyping(newStr: String, cursor: Int): String {
   return newStr
 }
 
+// Validate a string representation of list of MealData
 fun String.isValidMealDataList(): Boolean {
   return try {
     Json.decodeFromString(

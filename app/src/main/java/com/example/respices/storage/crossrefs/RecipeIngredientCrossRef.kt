@@ -6,6 +6,7 @@ import androidx.room.Index
 import com.example.respices.storage.entities.Ingredient
 import com.example.respices.storage.entities.Recipe
 
+// RecipeIngredientCrossRef - link between Recipe and its assigned Ingredients
 @Entity(primaryKeys = ["recipeId", "ingredientId"],
   foreignKeys = [
     ForeignKey(

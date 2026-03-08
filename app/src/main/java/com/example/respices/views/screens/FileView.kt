@@ -1,7 +1,6 @@
 package com.example.respices.views.screens
 
 import android.content.ClipData
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,17 +55,20 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
+// UI Screen to display all meals as a single file, and allow operations over it
 @Composable
 fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
   RespicesTheme {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // Clipboard manager
     val clipboard: Clipboard = LocalClipboard.current
 
     val initialFile = remember { mutableStateOf("") }
     val currentFile = remember { mutableStateOf("") }
 
+    // All meals & their JSON form
     val allMealsState by recipeViewModel.allMeals.collectAsStateWithLifecycle()
     val allMealsJson by remember(
       allMealsState
@@ -86,16 +88,16 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
 
     val isChangesSaved = remember { mutableStateOf(true) }
 
+    // Startup - initialisation of variables
     LaunchedEffect(Unit) {
       initialFile.value = allMealsJson
       currentFile.value = initialFile.value
     }
 
+    // Whenever file changes - update the database accordingly (if possible)
     LaunchedEffect(currentFile.value) {
       if (currentFile.value.isValidMealDataList()) {
         isFileValid.value = true
-
-//        Log.d("file view test", "valid new file")
 
         if (allMealsJson != currentFile.value) {
           if (isChangesSaved.value) {
@@ -111,8 +113,10 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
             mealData.toMeal()
           }
 
+          // Updating database
           recipeViewModel.clearAll {
             scope.launch {
+              // Insert new set of meals
               allNewMeals.forEach { meal ->
                 recipeViewModel.upsertMeal(
                   recipe = meal.recipe,
@@ -129,11 +133,7 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
         }
       } else {
         isFileValid.value = false
-
-//        Log.d("file view test", "invalid new file")
       }
-
-//      Log.d("file view test", "new file: ${currentFile.value}")
     }
 
     Text(
@@ -146,6 +146,7 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
     )
 
     if (!isFileValid.value) {
+      // Display appropriate error message when file inserted is invalid
       Text(
         text = buildAnnotatedString {
           append("Invalid meal list. Changes were ")
@@ -205,6 +206,7 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
           .padding(horizontal = 10.dp)
           .clickable {
             scope.launch {
+              // Copy into clipboard
               clipboard.setClipEntry(
                 ClipEntry(
                   ClipData.newPlainText(
@@ -225,6 +227,7 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
           .padding(horizontal = 10.dp)
           .clickable {
             scope.launch {
+              // Paste from the clipboard
               var res = ""
               clipboard.getClipEntry()?.clipData?.let { data ->
                 if (data.itemCount > 0) {
@@ -246,6 +249,7 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
         modifier = Modifier
           .padding(horizontal = 10.dp)
           .clickable {
+            // Rewind changes made
             Toast.makeText(context, "Rewound successfully!", Toast.LENGTH_SHORT).show()
             isChangesSaved.value = false
 
@@ -255,52 +259,5 @@ fun FileView(recipeViewModel: RecipeViewModel = viewModel()) {
           .padding(20.dp)
       )
     }
-
-//    SelectionContainer {
-//      Column(
-//        modifier = Modifier
-//          .wrapContentHeight()
-//          .fillMaxWidth()
-//      ) {
-//        Spacer(
-//          modifier = Modifier
-//            .height(60.dp)
-//        )
-//        Text(
-//          text = "COPY FROM HERE",
-//          fontSize = 28.sp
-//        )
-//        Spacer(
-//          modifier = Modifier
-//            .height(40.dp)
-//        )
-//        Text(
-//          text = """
-//        [
-//          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]}
-//        ]
-//        """.trimIndent(),
-//          fontSize = 15.sp
-//        )
-//        Spacer(
-//          modifier = Modifier
-//            .height(40.dp)
-//        )
-//        Text(
-//          text = """
-//        [
-//          {"name":"Recipe C1","time":90,"rating":1.5,"steps":"Mix A and B together\nThink about life\n1) Put A in B\n2) Add 200ml of water\n3) Heat up oven to 200°C\nDone now go and eat","link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","corn","tomatoes"],"tags":["soup","sweet","spicy"]},
-//          {"name":"Recipe B2","time":30,"rating":9.5,"link":"https://preppykitchen.com/lemon-merengue-tarts/","ingredients":["carrots","sugar","tomatoes"],"tags":["soup","sweet","sour"]},
-//          {"name":"Recipe A3 Very Very Very Very Very Very Very Long","time":120,"rating":6.0,"ingredients":["sugar","eggs","milk"],"tags":["sweet","party","long"]}
-//        ]
-//        """.trimIndent(),
-//          fontSize = 15.sp
-//        )
-//        Spacer(
-//          modifier = Modifier
-//            .height(40.dp)
-//        )
-//      }
-//    }
   }
 }

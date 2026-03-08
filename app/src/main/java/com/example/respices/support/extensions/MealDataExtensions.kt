@@ -6,6 +6,7 @@ import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
 import com.example.respices.support.classes.MealData
 
+// Convert MealData to Meal
 fun MealData.toMeal(): Meal {
   return Meal(
     recipe = Recipe(

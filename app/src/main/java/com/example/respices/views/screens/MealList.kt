@@ -35,6 +35,7 @@ import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.viewmodel.RecipeViewModel
 import com.example.respices.views.elements.output.MealDisplay
 
+// UI Screen to view a dynamic list of all meals
 @Composable
 fun MealList(
   bottomReached: Boolean,
@@ -47,18 +48,20 @@ fun MealList(
 
     LaunchedEffect(bottomReached) {
       if (bottomReached) {
-//        if (loadedMeals.size < allMealsState.size) {
-//          loadedMeals.add(allMealsState[loadedMeals.size])
-//        }
         if (loadedMeals.size < allMealsState.size) {
+          // Load a new meal once bottom reached and meals left to load
+          // Meals are shown in alphabetical order of their names
+
           val allMealNames = allMealsState.map { meal -> meal.recipe.name }
 
           var highestLoaded: String = ""
 
+          // Recording latest in the alphabet name of the meal loaded
           if (loadedMeals.size > 0) {
             highestLoaded = loadedMeals[loadedMeals.size - 1].recipe.name
           }
 
+          // Selection Sort - selecting next meal to laod
           var lowest: String = "\uFFFF"
           allMealNames.forEach { value ->
             if (value < lowest && value > highestLoaded) {
@@ -105,6 +108,7 @@ fun MealList(
         }
       }
 
+      // Display all loaded meals as MealDisplay
       loadedMeals.forEach {meal ->
         MealDisplay(meal)
       }

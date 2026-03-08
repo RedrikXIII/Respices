@@ -8,9 +8,10 @@ import com.example.respices.storage.crossrefs.RecipeTagCrossRef
 
 // Meal Entity
 data class Meal(
+  // Extend Recipe Entity
   @Embedded val recipe: Recipe,
 
-  // retrieves all assigned ingredients
+  // Retrieve all assigned ingredients
   @Relation(
     parentColumn = "recipeId",
     entityColumn = "ingredientId",
@@ -18,7 +19,7 @@ data class Meal(
   )
   val ingredients: List<Ingredient>,
 
-  // retrieves all assigned tags
+  // Retrieve all assigned tags
   @Relation(
     parentColumn = "recipeId",
     entityColumn = "tagId",

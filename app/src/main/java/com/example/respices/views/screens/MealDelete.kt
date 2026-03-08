@@ -1,6 +1,5 @@
 package com.example.respices.views.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,6 +54,7 @@ import com.example.respices.viewmodel.RecipeViewModel
 import com.example.respices.views.elements.HorizontalLine
 import kotlinx.coroutines.launch
 
+// UI Screen to delete a single selected meal
 @Composable
 fun MealDelete(
   mealI: Meal?,
@@ -63,9 +63,11 @@ fun MealDelete(
   RespicesTheme {
     val context = LocalContext.current
 
+    // Backup copy of the meal & state of deletion
     val copyMeal = remember { mutableStateOf(getEmptyMeal()) }
     val isDeleted = remember { mutableStateOf(false) }
 
+    // Startup - initialise variables
     LaunchedEffect(Unit) {
       if (mealI == null && !isDeleted.value) {
         GlobalState.setCurrentScreen(Screen.MEAL_LIST)
@@ -77,6 +79,7 @@ fun MealDelete(
     }
 
     if (!isDeleted.value) {
+      // UI before the element is deleted
       Text(
         text = "Deleting...",
         fontSize = 34.sp,
@@ -137,6 +140,7 @@ fun MealDelete(
           .padding(top = 60.dp)
       )
 
+      // Warning message
       Text(
         text = buildAnnotatedString {
           append("Once you leave the screen, the deletion will be ")
@@ -165,6 +169,7 @@ fun MealDelete(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
           ) {
+            // Delete meal from database, but keep copy in case of rewind
             Toast.makeText(context, "Meal deleted!", Toast.LENGTH_SHORT).show()
 
             isDeleted.value = true
@@ -193,7 +198,7 @@ fun MealDelete(
         ) {
           Image(
             painter = painterResource(R.drawable.outline_delete_24),
-            contentDescription = "rewind icon",
+            contentDescription = "delete icon",
             modifier = Modifier
               .padding(all = 20.dp)
               .height(40.dp)
@@ -212,6 +217,7 @@ fun MealDelete(
     }
 
     if (isDeleted.value) {
+      // UI directly after the meal has been deleted
       Text(
         text = "Deleted",
         fontSize = 34.sp,
@@ -263,6 +269,7 @@ fun MealDelete(
         )
       }
 
+      // Explanation message
       Text(
         text = buildAnnotatedString {
           append("While on this screen, you can still ")
@@ -288,6 +295,7 @@ fun MealDelete(
             indication = null,
             interactionSource = remember { MutableInteractionSource() }
           ) {
+            // Re-inserting the deleted meal backup copy
             Toast.makeText(context, "Reverted deletion!", Toast.LENGTH_SHORT).show()
 
             isDeleted.value = false

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.respices.R
 import com.example.respices.support.utility.HeightBasedRoundedShape
 
-@OptIn(ExperimentalLayoutApi::class)
+// UI element for dynamically displaying a list of words, with option to delete them
 @Composable
 fun EditableList(
   list: SnapshotStateList<String>,
@@ -40,6 +40,7 @@ fun EditableList(
       .fillMaxWidth()
       .heightIn(min = 40.dp)
   ) {
+    // Display all elements
     list.forEachIndexed { index, str ->
       Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -75,6 +76,7 @@ fun EditableList(
             .height(20.dp)
             .aspectRatio(1.0f)
             .clickable {
+              // Removing an element if it selected to be deleted by the user
               list.removeAt(index)
               onRemove.invoke(str)
             }

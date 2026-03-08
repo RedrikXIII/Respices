@@ -7,6 +7,7 @@ import com.example.respices.storage.entities.Tag
 import com.example.respices.support.classes.MealData
 import com.example.respices.support.enums.MealFault
 
+// Convert Meal to String (DEBUG ONLY)
 fun Meal.toString2(): String {
   var result: String = "{${this.recipe.name}, ${this.recipe.time}, ${this.recipe.rating}, " +
           "${this.recipe.link}, ${this.recipe.steps}, "
@@ -31,6 +32,7 @@ fun Meal.toString2(): String {
   return result
 }
 
+// Determine whether a single meal can appear in the selection
 fun Meal.isSelected(time: Long, ingredients: List<Ingredient>): Boolean {
   if (this.recipe.time > time)
     return false
@@ -44,6 +46,7 @@ fun Meal.isSelected(time: Long, ingredients: List<Ingredient>): Boolean {
   return true
 }
 
+// Calculate acceptanceIndex of a single Meal
 fun Meal.acceptanceIndex(tags: List<Tag>): Double {
   var result: Double = 1.0
 
@@ -63,6 +66,7 @@ fun Meal.acceptanceIndex(tags: List<Tag>): Double {
   return result
 }
 
+// Determine whether a meal is valid, and return an appropriate error if it isn't
 fun Meal.isValid(): Pair<Boolean, MealFault> {
   // Name -> Ingredients -> Time
   if (this.recipe.name.trim() == "") {
@@ -80,6 +84,7 @@ fun Meal.isValid(): Pair<Boolean, MealFault> {
   return Pair(true, MealFault.NONE)
 }
 
+// Determine whether a meal is empty
 fun Meal.isEmpty(): Boolean {
   return this.recipe.name == "" &&
           this.recipe.time == 0L &&
@@ -90,6 +95,20 @@ fun Meal.isEmpty(): Boolean {
           this.tags.isEmpty()
 }
 
+// Convert Meal to MealData
+fun Meal.toMealData(): MealData {
+  return MealData(
+    name = this.recipe.name,
+    time = this.recipe.time,
+    rating = this.recipe.rating,
+    link = this.recipe.link,
+    steps = this.recipe.steps,
+    ingredients = this.ingredients.map { ingredient -> ingredient.name },
+    tags = this.tags.map { tag -> tag.name }
+  )
+}
+
+// Create an empty meal
 fun getEmptyMeal(): Meal {
   return Meal(
     recipe = Recipe(
@@ -101,17 +120,5 @@ fun getEmptyMeal(): Meal {
     ),
     ingredients = listOf(),
     tags = listOf()
-  )
-}
-
-fun Meal.toMealData(): MealData {
-  return MealData(
-    name = this.recipe.name,
-    time = this.recipe.time,
-    rating = this.recipe.rating,
-    link = this.recipe.link,
-    steps = this.recipe.steps,
-    ingredients = this.ingredients.map { ingredient -> ingredient.name },
-    tags = this.tags.map { tag -> tag.name }
   )
 }

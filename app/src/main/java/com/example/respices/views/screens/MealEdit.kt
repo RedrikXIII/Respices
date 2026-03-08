@@ -1,6 +1,5 @@
 package com.example.respices.views.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -92,57 +91,59 @@ import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalFoundationApi::class)
+// UI Screen to edit an existing meal or create one from blank
 @Composable
 fun MealEdit(
   mealI: Meal?,
   recipeViewModel: RecipeViewModel = viewModel()
 ) {
   RespicesTheme {
+    // Additional utility for lambda functions
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    // store initial and current state and information about the selected meal
+    // Store initial and current state and information about the selected meal
     val meal = remember { mutableStateOf<Meal>(getEmptyMeal()) }
     val initialMeal = remember { mutableStateOf<Meal>(getEmptyMeal()) }
     val isNewMeal = remember { mutableStateOf<Boolean>(true) }
     val mealFault = remember { mutableStateOf(MealFault.NONE) }
 
-    // store all ingredients for fast search and lookup
+    // Store all ingredients for fast search and lookup
     val allIngredientsState by recipeViewModel.allIngredients.collectAsStateWithLifecycle()
     val allIngredients: List<String> = allIngredientsState.map { i -> i.name }
 
-    // store all tags for fast search and lookup
+    // Store all tags for fast search and lookup
     val allTagsState by recipeViewModel.allTags.collectAsStateWithLifecycle()
     val allTags: List<String> = allTagsState.map { i -> i.name }
 
-    // store input data about the meal
+    // Store input data about the meal
     val mealIngredients = remember { mutableStateListOf<String>() }
     val mealTags = remember { mutableStateListOf<String>() }
     val mealTime = remember { mutableLongStateOf(0L) }
     var ratingFieldValue by remember { mutableStateOf(TextFieldValue()) }
 
-    // used to prevent multiple fast updates
+    // Used to prevent multiple fast updates
     val isUpdateBlocked = remember { mutableStateOf(false) }
 
-    // manage focus of input fields
+    // Manage focus of input fields
     val wasNameFocused = remember { mutableStateOf(false) }
     val wasRatingFocused = remember { mutableStateOf(false) }
     val wasStepsFocused = remember { mutableStateOf(false) }
     val wasLinkFocused = remember { mutableStateOf(false) }
     val wasRewindFocused = remember { mutableStateOf(false) }
 
-    // manage rewind
+    // Manage rewind
     val rewindFocusRequester = remember { FocusRequester() }
     val rewindInteractionSource = remember { MutableInteractionSource() }
     val isRewindConfirmed = remember { mutableStateOf(false) }
 
     val isChangesToast = remember { mutableStateOf(true) }
 
+    // Function performed whenever meal is changed - validation and saving changes if valid
     val onMealChange = {
+      // Create a new clean copy
       meal.value = meal.value.copy(
         recipe = meal.value.recipe.copy(
           time = mealTime.longValue
@@ -151,37 +152,35 @@ fun MealEdit(
         tags = mealTags.map { tag -> Tag(name = tag) }
       )
 
+      // Validate the meal
       val validation = meal.value.isValid()
 
+      // Record validation error if invalid
       mealFault.value = validation.second
 
-      Log.d(
-        "meal edit test",
-        "does edit pass? validation: ${validation.first}, update block: ${isUpdateBlocked.value}"
-      )
-
       if (validation.first && !isUpdateBlocked.value) {
+        // If valid and not too many updates at once
         if (isChangesToast.value) {
           Toast.makeText(context, "Changes saved!", Toast.LENGTH_SHORT).show()
         }
         isChangesToast.value = true
 
-        // meal is valid - upsert
         isUpdateBlocked.value = true
-        Log.d("meal edit test", "Valid change")
 
         scope.launch {
           delay(500L)
           isUpdateBlocked.value = false
         }
 
+        // Meal is valid - upsert
         recipeViewModel.upsertMeal(
           meal.value.recipe,
           meal.value.ingredients,
           meal.value.tags
         ) { index ->
           isUpdateBlocked.value = false
-          Log.d("meal edit test", "Upserted successfully")
+
+          // Retrieve newly updated meal
           recipeViewModel.allMeals.value.find { meal ->
             meal.recipe.recipeId == index
           }?.let { newMeal ->
@@ -204,13 +203,20 @@ fun MealEdit(
       }
     }
 
+    // Startup - initializing variables
     LaunchedEffect(Unit) {
       if (mealI != null) {
         meal.value = mealI.copy()
         initialMeal.value = mealI.copy()
 
+        // Mapping ingredients to their names for display
         mealIngredients.clear()
-        mealIngredients.addAll(meal.value.ingredients.map { ing -> ing.name })
+        mealIngredients.addAll(
+          meal.value.ingredients.map {
+            // Extracting ingredient's name
+            ing -> ing.name
+          }
+        )
 
         mealTags.clear()
         mealTags.addAll(meal.value.tags.map { tag -> tag.name })
@@ -234,6 +240,7 @@ fun MealEdit(
         .wrapContentHeight()
     ) {
       if (mealFault.value != MealFault.NONE && !meal.value.isEmpty()) {
+        // If meal is invalid, display an appropriate error message based on the error
         val errorMessage = when (mealFault.value) {
           MealFault.NO_NAME -> listOf("! Please specify the ", "name", " of the meal")
           MealFault.NO_TIME -> listOf("! Please specify a ", "non-zero time")
@@ -263,21 +270,14 @@ fun MealEdit(
         )
       }
 
+      // Editing mode - rewind functionality
       if (!isNewMeal.value) {
         Box(
           modifier = Modifier
             .wrapContentSize()
             .onFocusChanged { focusState: FocusState ->
-              Log.d(
-                "meal edit rewind test",
-                "focus changed from ${wasRewindFocused.value} to ${focusState.isFocused}"
-              )
               if (!focusState.isFocused && wasRewindFocused.value) {
                 isRewindConfirmed.value = false
-                Log.d(
-                  "meal edit rewind test",
-                  "isRewindConfirmed reset: ${isRewindConfirmed.value}"
-                )
               }
 
               wasRewindFocused.value = focusState.isFocused
@@ -296,14 +296,14 @@ fun MealEdit(
                 isRewindConfirmed.value = false
 
                 if (isNewMeal.value) {
-                  // delete new meal
+                  // Delete new meal if rewound
                   recipeViewModel.deleteMeal(
                     recipe = meal.value.recipe
                   ) {
                     GlobalState.setCurrentScreen(Screen.MEAL_LIST)
                   }
                 } else {
-                  // revert the meal back to initial
+                  // Revert the meal back to initial
                   meal.value = initialMeal.value.copy()
 
                   mealIngredients.clear()
@@ -411,6 +411,7 @@ fun MealEdit(
         )
       }
 
+      // Meal Name Editing
       OutlinedTextField(
         value = meal.value.recipe.name,
         onValueChange = { text ->
@@ -448,6 +449,7 @@ fun MealEdit(
           )
           .onFocusChanged { focusState ->
             if (!focusState.isFocused && wasNameFocused.value) {
+              // On unfocus of name field - update meal
               onMealChange.invoke()
             }
 
@@ -455,6 +457,7 @@ fun MealEdit(
           }
       )
 
+      // Meal Ingredients Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -509,6 +512,7 @@ fun MealEdit(
         onMealChange.invoke()
       }
 
+      // Meal Tags Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -563,6 +567,7 @@ fun MealEdit(
         onMealChange.invoke()
       }
 
+      // Meal Time Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -610,6 +615,7 @@ fun MealEdit(
         }
       )
 
+      // Meal Rating Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -683,6 +689,7 @@ fun MealEdit(
           OutlinedTextField(
             value = ratingFieldValue,
             onValueChange = { newInputPre: TextFieldValue ->
+              // Rating input formatting
               var newText = ratingFieldValue.text.replaceTyping(
                 newInputPre.text,
                 newInputPre.selection.start
@@ -693,10 +700,11 @@ fun MealEdit(
               if (newText.contains('.')) {
                 newText += "0"
               }
-              Log.d("rating edit test", "rating input: $newText")
+
               var newInput = newInputPre.copy(text = newText)
 
               newInput.text.toDoubleOrNull()?.let { newRPre ->
+                // Additional rating processing into a valid double
                 var newR = max(min(newRPre, 10.0), 0.0)
                 newR = (newR * 10).div(10)
 
@@ -706,6 +714,7 @@ fun MealEdit(
                   )
                 }
 
+                // Updating input text accordingly
                 ratingFieldValue = ratingFieldValue.copy(
                   text = "$newR",
                   selection = newInput.selection
@@ -740,6 +749,7 @@ fun MealEdit(
             modifier = Modifier
               .bringIntoViewRequester(bringIntoViewRequester)
               .onFocusChanged { focusState: FocusState ->
+                // Managing Focus changes & events of focusing/unfocusing
                 if (!focusState.isFocused && wasRatingFocused.value) {
                   onMealChange.invoke()
                 }
@@ -773,6 +783,7 @@ fun MealEdit(
         )
       }
 
+      // Meal Steps Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -851,6 +862,7 @@ fun MealEdit(
             shape = MaterialTheme.shapes.extraSmall
           )
           .onFocusChanged { focusState ->
+            // Managing Focus changes & events of focusing
             if (!focusState.isFocused && wasStepsFocused.value) {
               onMealChange.invoke()
             }
@@ -859,6 +871,7 @@ fun MealEdit(
           }
       )
 
+      // Meal Link Editing
       Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -940,6 +953,7 @@ fun MealEdit(
             shape = MaterialTheme.shapes.extraSmall
           )
           .onFocusChanged { focusState ->
+            // Managing Focus changes & events of focusing
             if (!focusState.isFocused && wasLinkFocused.value) {
               onMealChange.invoke()
             }

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+// UI element to visually separate 2 vertical sections
 @Composable
 fun HorizontalLine(
   color: Color,

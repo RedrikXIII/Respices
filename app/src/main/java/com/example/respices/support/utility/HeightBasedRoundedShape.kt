@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
+// Create circular borders for an element
 class HeightBasedRoundedShape : Shape {
   override fun createOutline(
     size: androidx.compose.ui.geometry.Size,

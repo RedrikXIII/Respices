@@ -14,6 +14,7 @@ import com.example.respices.storage.entities.Ingredient
 import com.example.respices.storage.entities.Recipe
 import com.example.respices.storage.entities.Tag
 
+// Database hosting all tables
 @Database(
   entities = [
     Recipe::class,
@@ -32,6 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun tagDao(): TagDao
   abstract fun crossRefDao(): CrossRefDao
 
+  // Database instance
   companion object {
     @Volatile
     private var INSTANCE: AppDatabase? = null

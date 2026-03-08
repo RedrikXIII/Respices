@@ -1,6 +1,5 @@
 package com.example.respices.views.elements.input
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,24 +59,29 @@ import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalFoundationApi::class)
+// UI element for selecting amount of hours and minutes
 @Composable
 fun DurationPicker(
   initialTime: Long,
   onConfirm: (Long) -> Unit
 ) {
+  // Current time as total amount of minutes
   var curTime by remember { mutableLongStateOf(initialTime) }
 
+  // Formatted to fit withing acceptable range initial hours and minutes
   val ih = max(min(curTime.div(60L), 99L), 0L).toString()
   val im0 = max(min(curTime.mod(60L), 59L), 0L)
   val im = "${im0.div(10L)}${im0.mod(10L)}"
 
+  // Values of the input fields
   var hoursFieldValue by remember { mutableStateOf(TextFieldValue(ih)) }
   var minutesFieldValue by remember { mutableStateOf(TextFieldValue(im)) }
 
+  // Current hour and minutes string values
   var curHours by remember { mutableStateOf(ih) }
   var curMinutes by remember { mutableStateOf(im) }
 
+  // Field focus management
   val focusManager = LocalFocusManager.current
 
   val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -94,11 +98,13 @@ fun DurationPicker(
   var isMinuteTransition by remember { mutableStateOf(false) }
   var isFocusClearRequested by remember { mutableStateOf(false) }
 
+  // Manage focus changes from one field to another
   LaunchedEffect(isFocusClearRequested) {
     if (isFocusClearRequested) {
       focusManager.clearFocus(force = true)
       isFocusClearRequested = false
 
+      // Handle hour -> minute focus transition
       if (isMinuteTransition) {
         minuteFocusRequester.requestFocus()
         isMinuteTransition = false
@@ -106,6 +112,7 @@ fun DurationPicker(
     }
   }
 
+  // Handle initialTime changed from outside the @Composable function
   LaunchedEffect(initialTime) {
     curTime = initialTime
 
@@ -120,6 +127,7 @@ fun DurationPicker(
     minutesFieldValue = minutesFieldValue.copy(text = imi)
   }
 
+  // All inner UI elements
   RespicesTheme {
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -162,6 +170,7 @@ fun DurationPicker(
         OutlinedTextField(
           value = hoursFieldValue,
           onValueChange = { newInputPre: TextFieldValue ->
+            // Formatting input for processing
             var newText = newInputPre.text
             if (newText == "") {
               newText = "0"
@@ -169,6 +178,7 @@ fun DurationPicker(
             var newInput = newInputPre.copy(text = newText)
 
             newInput.text.toLongOrNull()?.let { newInputLong ->
+              // Additional formatting for number processing
               val str: String = newInput.text
               curHours = curHours.replaceTyping(str, newInput.selection.end)
 
@@ -177,22 +187,21 @@ fun DurationPicker(
               }
 
               curHours.toLongOrNull()?.let { curHoursLong ->
-                Log.d("time picker test", "new: $curHoursLong, old: ${curTime.div(60L)}")
                 if (curHoursLong < 10L && curTime.div(60L) >= 10L) {
+                  // Handling 1X -> 0X input cursor placement
                   newInput = newInput.copy(
                     selection = TextRange(newInput.selection.start - 1)
                   )
-                  Log.d("time picker test", "selection changed: ${newInput.selection}")
                 }
 
+                // Calculating new total minutes and respective hours and minutes
                 val nit = max(min(curHoursLong, 99L), 0L)
                 curTime = nit * 60 + curTime.mod(60)
                 curHours = nit.toString()
               }
               hoursFieldValue = newInput.copy(text = curHours)
 
-              Log.d("time picker test", "copied selection: ${hoursFieldValue.selection}")
-
+              // Dynamically changing focus from hours to minutes when finished typing
               if (newInput.selection.length == 0 &&
                   selectionPrev.length == 0 && (
                     (newInput.selection.end >= 2 &&
@@ -234,6 +243,7 @@ fun DurationPicker(
             .bringIntoViewRequester(bringIntoViewRequester)
             .focusRequester(hourFocusRequester)
             .onFocusChanged { focusState: FocusState ->
+              // Handling focus changes, as well as when focus is gained and lost
               if (!focusState.isFocused && wasFocused) {
                 onConfirm.invoke(curTime)
               }
@@ -293,6 +303,7 @@ fun DurationPicker(
         OutlinedTextField(
           value = minutesFieldValue,
           onValueChange = { newInputPre: TextFieldValue ->
+            // Formatting input for processing
             var newText = newInputPre.text
             if (newText == "") {
               newText = "0"
@@ -300,6 +311,7 @@ fun DurationPicker(
             val newInput = newInputPre.copy(text = newText)
 
             newInput.text.toLongOrNull()?.let {
+              // Additional formatting for number processing
               val str: String = newInput.text
               curMinutes = curMinutes.replaceTyping(str, newInput.selection.end)
 
@@ -307,12 +319,14 @@ fun DurationPicker(
                 curMinutes = curMinutes.substring(startIndex = 0, endIndex = 2)
               }
               curMinutes.toLongOrNull()?.let {
+                // Calculating new total minutes and respective hours and minutes
                 val nit = max(min(it, 59L), 0L)
                 curTime = curTime.div(60) * 60 + nit
                 curMinutes = "${nit.div(10)}${nit.mod(10)}"
               }
               minutesFieldValue = newInput.copy(text = curMinutes)
 
+              // Dynamically clearing focus when finished typing
               if (newInput.selection.length == 0 &&
                   newInput.selection.end >= 2 &&
                   selectionPrev.length == 0 &&
@@ -349,6 +363,7 @@ fun DurationPicker(
             .bringIntoViewRequester(bringIntoViewRequester)
             .focusRequester(minuteFocusRequester)
             .onFocusChanged { focusState: FocusState ->
+              // Handling focus changes, as well as when focus is gained and lost
               if (!focusState.isFocused && wasFocused2) {
                 onConfirm(curTime)
               }

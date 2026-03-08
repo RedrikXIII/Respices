@@ -3,8 +3,8 @@ package com.example.respices.support.services
 import com.example.respices.R
 import com.example.respices.support.enums.Screen
 
+// Lookup pre-stored values
 object GlobalLookup {
-
   // each Triple<> stores data for 3 top bar buttons
   // each Pair<> stores data for a single button
   // first value stores the screen user will be directed to

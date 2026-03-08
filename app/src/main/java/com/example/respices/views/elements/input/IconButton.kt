@@ -25,10 +25,9 @@ fun IconButton(
   modifier: Modifier = Modifier,
   imageModifier: Modifier = Modifier
 ) {
-  // applies coloring and global styles
+  // Apply coloring and global styles
   RespicesTheme {
-    // container for the image
-    // handles clicks
+    // Container for the image
     Box (
       modifier = modifier
         .border(
@@ -45,7 +44,7 @@ fun IconButton(
         )
         .clip(MaterialTheme.shapes.small)
     ) {
-      // displays the icon
+      // Display the icon
       Image(
         painter = painterResource(icon ?: R.drawable.baseline_question_mark_24),
         contentDescription = "Icon!",

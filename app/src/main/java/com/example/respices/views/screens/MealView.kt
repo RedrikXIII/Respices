@@ -47,7 +47,7 @@ import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.ui.theme.RespicesTheme
 import com.example.respices.views.elements.HorizontalLine
 
-@OptIn(ExperimentalLayoutApi::class)
+// UI Screen to display all information about a single meal
 @Composable
 fun MealView(
   mealI: Meal?
@@ -55,11 +55,13 @@ fun MealView(
   RespicesTheme {
     LaunchedEffect(Unit) {
       if (mealI == null) {
+        // If no meal selected - navigate to Meal List Screen
         GlobalState.setCurrentScreen(Screen.MEAL_LIST)
       }
     }
 
     if (mealI == null) {
+      // Error Message if no meal selected
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -88,18 +90,12 @@ fun MealView(
         modifier = Modifier
           .fillMaxWidth()
           .wrapContentHeight()
-//          .background(
-//            color = Color.Yellow
-//          )
           .padding(top = 30.dp)
-//          .background(
-//            color = Color.LightGray
-//          )
           .drawBehind {
             val stroke = 1.dp.toPx()
             val c = Color.Black
 
-            // left
+            // Left visual border
             drawLine(
               color = c,
               start = Offset(0f, size.height / 2),
@@ -107,7 +103,7 @@ fun MealView(
               strokeWidth = stroke
             )
 
-            // right
+            // Right visual border
             drawLine(
               color = c,
               start = Offset(size.width, size.height / 2),
@@ -126,6 +122,7 @@ fun MealView(
             .padding(vertical = 20.dp)
         )
 
+        // Meal Name Display
         Text(
           text = meal.recipe.name,
           fontSize = 30.sp,
@@ -158,7 +155,7 @@ fun MealView(
             val stroke = 1.dp.toPx()
             val c = Color.Black
 
-            // left
+            // Left visual border
             drawLine(
               color = c,
               start = Offset(0f, 0f),
@@ -166,7 +163,7 @@ fun MealView(
               strokeWidth = stroke
             )
 
-            // bottom
+            // Bottom visual border
             drawLine(
               color = c,
               start = Offset(0f, size.height),
@@ -174,7 +171,7 @@ fun MealView(
               strokeWidth = stroke
             )
 
-            // right
+            // Right visual border
             drawLine(
               color = c,
               start = Offset(size.width, 0f),
@@ -183,6 +180,7 @@ fun MealView(
             )
           }
       ) {
+        // Meal Ingredients Display
         Row(
           horizontalArrangement = Arrangement.Center,
           verticalAlignment = Alignment.CenterVertically,
@@ -226,6 +224,7 @@ fun MealView(
           modifier = Modifier
             .fillMaxWidth()
         ) {
+          // Displaying each ingredient of the meal
           meal.ingredients.map { ing -> ing.name }.forEach { ing ->
             Box(
               modifier = Modifier
@@ -251,6 +250,7 @@ fun MealView(
           }
         }
 
+        // Meal Tags Display
         Row(
           horizontalArrangement = Arrangement.Center,
           verticalAlignment = Alignment.CenterVertically,
@@ -296,6 +296,7 @@ fun MealView(
           modifier = Modifier
             .fillMaxWidth()
         ) {
+          // Displaying each tag of the meal
           meal.tags.map { tag -> tag.name }.forEach { tag ->
             Box(
               modifier = Modifier
@@ -321,6 +322,7 @@ fun MealView(
           }
         }
 
+        // Meal Time & Rating Display
         Row(
           horizontalArrangement = Arrangement.Center,
           verticalAlignment = Alignment.CenterVertically,
@@ -381,6 +383,7 @@ fun MealView(
                 .size(45.dp)
             )
 
+            // Format Time into an appropriate string
             val fHours: String = "${meal.recipe.time.div(60)}"
             val fMinutes: String =
               "${meal.recipe.time.mod(60).div(10)}${meal.recipe.time.mod(60).mod(10)}"
@@ -405,6 +408,7 @@ fun MealView(
                 .size(45.dp)
             )
 
+            // Format Rating into appropriate string
             val fRating: Double = (meal.recipe.rating * 10).div(10)
 
             Text(
@@ -415,6 +419,7 @@ fun MealView(
         }
 
         if (meal.recipe.steps != "") {
+          // Meal Step Display
           Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
@@ -463,6 +468,7 @@ fun MealView(
         }
 
         if (meal.recipe.link != "") {
+          // Meal Link Display
           Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,

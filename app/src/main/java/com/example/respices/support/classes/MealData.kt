@@ -2,6 +2,8 @@ package com.example.respices.support.classes
 
 import kotlinx.serialization.Serializable
 
+// Meal Data
+// used to convert meal to JSON and vice-versa
 @Serializable
 data class MealData(
   val name: String = "",

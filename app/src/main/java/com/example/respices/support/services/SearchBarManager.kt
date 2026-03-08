@@ -20,9 +20,10 @@ object SearchBarManager {
   var isActive by mutableStateOf(false)
     private set
 
-  // is invoked with the final result of the search input
+  // invoked with the final result of the search input
   private var onComplete: (String) -> Unit = {}
 
+  // what element to exclude from search
   var excludeOptions by mutableStateOf<List<String>>(listOf())
     private set
 

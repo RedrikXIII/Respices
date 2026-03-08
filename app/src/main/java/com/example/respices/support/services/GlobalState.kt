@@ -1,6 +1,5 @@
 package com.example.respices.support.services
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.respices.storage.entities.Meal
@@ -9,6 +8,7 @@ import com.example.respices.support.utility.Stack
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+// Store UI state, for access by all components
 object GlobalState {
   // currently selected screen
   // private modification, public access
@@ -42,10 +42,12 @@ object GlobalState {
     }
   }
 
+  // Set a new current meal
   fun setCurrentMeal(newMeal: Meal?) {
     _currentMeal.value = newMeal
   }
 
+  // Go to previously visited screen
   fun goToPrevScreen(): Boolean {
     if (_prevScreens.isEmpty())
       // reserve to default "go back" behaviour

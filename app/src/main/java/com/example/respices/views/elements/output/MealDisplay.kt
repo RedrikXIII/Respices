@@ -43,7 +43,7 @@ import com.example.respices.support.services.SearchBarManager
 import com.example.respices.support.utility.HeightBasedRoundedShape
 import com.example.respices.views.elements.HorizontalLine
 
-@OptIn(ExperimentalLayoutApi::class)
+// UI element to display the short form of information about a single meal
 @Composable
 fun MealDisplay(
   meal: Meal
@@ -66,10 +66,12 @@ fun MealDisplay(
         indication = null,
         interactionSource = remember { MutableInteractionSource() }
       ) {
+        // Transfer to Meal View when clicked
         GlobalState.setCurrentMeal(meal)
         GlobalState.setCurrentScreen(Screen.MEAL_VIEW)
       }
   ) {
+    // Displaying meal's name
     Text(
       text = meal.recipe.name,
       textAlign = TextAlign.Center,
@@ -92,6 +94,7 @@ fun MealDisplay(
         .padding(vertical = 15.dp)
     )
 
+    // Displaying meal's ingredients
     FlowRow(
       modifier = Modifier
         .fillMaxWidth()
@@ -104,6 +107,7 @@ fun MealDisplay(
           .padding(end = 5.dp)
       )
 
+      // Displaying each ingredient as the string of its name
       meal.ingredients.map { ing -> ing.name }.forEach { ing ->
         Box(
           modifier = Modifier
@@ -139,6 +143,7 @@ fun MealDisplay(
         .padding(vertical = 15.dp)
     )
 
+    // Displaying meal's tags
     FlowRow(
       modifier = Modifier
         .fillMaxWidth()
@@ -151,6 +156,7 @@ fun MealDisplay(
           .padding(end = 5.dp)
       )
 
+      // Displaying each tag as the string of its name
       meal.tags.map { tag -> tag.name }.forEach { tag ->
         Box(
           modifier = Modifier
@@ -186,6 +192,7 @@ fun MealDisplay(
         .padding(vertical = 15.dp)
     )
 
+    // Displaying meal's time
     Row(
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically,
@@ -206,6 +213,7 @@ fun MealDisplay(
             .size(35.dp)
         )
 
+        // Formatting time into appropriate text
         val fHours: String = "${meal.recipe.time.div(60)}"
         val fMinutes: String = "${meal.recipe.time.mod(60).div(10)}${meal.recipe.time.mod(60).mod(10)}"
 
@@ -215,6 +223,7 @@ fun MealDisplay(
         )
       }
 
+      // Displaying meal's rating
       Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -229,6 +238,7 @@ fun MealDisplay(
             .size(35.dp)
         )
 
+        // Formatting rating into appropriate text
         val fRating: Double = (meal.recipe.rating * 10).div(10)
 
         Text(

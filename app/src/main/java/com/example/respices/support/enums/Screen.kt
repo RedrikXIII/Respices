@@ -1,5 +1,6 @@
 package com.example.respices.support.enums
 
+// Screen - all available screens
 enum class Screen {
   START_PAGE,
   MEAL_LIST,
